@@ -149,7 +149,7 @@
     }
 
     function generateWordFreq() {
-        const stopWords = new Set(['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u', 'de', 'del', 'a', 'al', 'en', 'con', 'por', 'para', 'su', 'sus', 'que', 'se', 'lo', 'si', 'no', 'esta', 'este', 'esto', 'como', 'entre', 'sobre', 'desde', 'hasta', 'durante', 'mediante', 'ante', 'bajo', 'tras', 'mediante', 'analisis', 'estudio', 'estrategia', 'investigacion', 'desarrollo', 'impacto', 'caso', 'proceso', 'univeridad', 'estatal', 'sur', 'manabi', 'educacion', 'carrera', 'docentes', 'estudiantes', 'instituciones', 'educativas']);
+        const stopWords = new Set(['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u', 'de', 'del', 'a', 'al', 'en', 'con', 'por', 'para', 'su', 'sus', 'que', 'se', 'lo', 'si', 'no', 'esta', 'este', 'esto', 'como', 'entre', 'sobre', 'desde', 'hasta', 'durante', 'mediante', 'ante', 'bajo', 'tras', 'mediante', 'analisis', 'estudio', 'estrategia', 'investigacion', 'desarrollo', 'impacto', 'caso', 'proceso', 'univeridad', 'estatal', 'sur', 'manabi', 'educacion', 'carrera', 'docentes', 'estudiantes', 'instituciones', 'educativas', 'hacia']);
         const counts = {};
         
         publicaciones.forEach(pub => {
@@ -311,18 +311,6 @@
 {/if}
 
 <main class="container mx-auto px-4 py-6">
-    <!-- Nube de Palabras -->
-    <section class="mb-8">
-        <div class="bg-white rounded-xl shadow-md p-6">
-            <h3 class="font-semibold text-[#003627] mb-2 text-center">
-                <i class="fas fa-cloud text-[#289543] mr-2"></i>
-                Nube de Conceptos Clave
-            </h3>
-            <p class="text-center text-xs text-[#5A5B5E] mb-4 italic">Huella digital visual de nuestra producción científica</p>
-            <WordCloud words={wordFreq} />
-        </div>
-    </section>
-
     <!-- Gráficos al principio -->
     <section class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-md p-6">
@@ -332,6 +320,18 @@
         <div class="bg-white rounded-xl shadow-md p-6">
             <h3 class="font-semibold text-[#003627] mb-4"><i class="fas fa-database text-[#C12927] mr-2"></i>Artículos por Base de Datos</h3>
             <div class="h-64"><canvas bind:this={canvasBase}></canvas></div>
+        </div>
+    </section>
+
+    <!-- Nube de Palabras -->
+    <section class="mb-8">
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="font-semibold text-[#003627] mb-2 text-center">
+                <i class="fas fa-cloud text-[#289543] mr-2"></i>
+                Nube de Conceptos Clave
+            </h3>
+            <p class="text-center text-xs text-[#5A5B5E] mb-4 italic">Huella digital visual de nuestra producción científica</p>
+            <WordCloud words={wordFreq} />
         </div>
     </section>
 
