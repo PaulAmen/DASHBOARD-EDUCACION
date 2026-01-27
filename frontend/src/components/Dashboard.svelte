@@ -231,27 +231,53 @@
             });
         }
 
-        const bases = {};
+        const basesMap = {};
         publicaciones.filter(p => p.tipo === 'articulo').forEach(p => {
-            if (p.baseDatos) bases[p.baseDatos] = (bases[p.baseDatos] || 0) + 1;
+            if (p.baseDatos) {
+                if (!basesMap[p.baseDatos]) basesMap[p.baseDatos] = [];
+                // Extraer solo apellidos (asumiendo formato "APELLIDO1 APELLIDO2 NOMBRE1...")
+                const apellidos = p.autor ? p.autor.split(' ').slice(0, 2).join(' ') : 'Anonimo';
+                basesMap[p.baseDatos].push(apellidos);
+            }
         });
+
+        // Convertir a array y ordenar por cantidad
+        const basesSorted = Object.entries(basesMap)
+            .map(([base, autores]) => ({ base, count: autores.length, autores }))
+            .sort((a, b) => b.count - a.count);
 
         if (canvasBase) {
             chartBase = new Chart(canvasBase, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(bases),
+                    labels: basesSorted.map(d => d.base),
                     datasets: [{
                         label: 'Artículos',
-                        data: Object.values(bases),
+                        data: basesSorted.map(d => d.count),
                         backgroundColor: [colorGreen, colorDark, colorRed, colorGrey],
-                        borderRadius: 4
+                        borderRadius: 4,
+                        // Guardamos autores en el dataset para usarlos en el tooltip
+                        autoresList: basesSorted.map(d => d.autores) 
                     }]
                 },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterBody: function(context) {
+                                    const index = context[0].dataIndex;
+                                    const autores = context[0].dataset.autoresList[index];
+                                    // Mostrar máximo 10 autores para no hacer un tooltip gigante
+                                    const display = autores.slice(0, 10).map(a => `• ${a}`);
+                                    if (autores.length > 10) display.push(`...y ${autores.length - 10} más`);
+                                    return ['', 'Autores:', ...display];
+                                }
+                            }
+                        }
+                    }, 
                     scales: { 
                         y: { beginAtZero: true, ticks: { color: colorGrey } },
                         x: { ticks: { color: colorGrey } }
