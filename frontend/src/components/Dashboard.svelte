@@ -186,6 +186,12 @@
         if (chartTipo) chartTipo.destroy();
         if (chartBase) chartBase.destroy();
 
+        // UNESUM Palette
+        const colorGreen = '#289543';
+        const colorRed = '#C12927';
+        const colorDark = '#003627';
+        const colorGrey = '#5A5B5E';
+
         if (canvasTipo) {
             chartTipo = new Chart(canvasTipo, {
                 type: 'doughnut',
@@ -193,11 +199,11 @@
                     labels: ['Artículos', 'Libros', 'Capítulos'],
                     datasets: [{
                         data: [conteoArticulos, conteoLibros, conteoCapitulos],
-                        backgroundColor: ['#3b82f6', '#22c55e', '#a855f7'],
+                        backgroundColor: [colorGreen, colorRed, colorDark],
                         borderWidth: 0
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: colorGrey } } } }
             });
         }
 
@@ -214,11 +220,19 @@
                     datasets: [{
                         label: 'Artículos',
                         data: Object.values(bases),
-                        backgroundColor: ['#3b82f6', '#22c55e', '#f59e0b', '#a855f7'],
-                        borderRadius: 6
+                        backgroundColor: [colorGreen, colorDark, colorRed, colorGrey],
+                        borderRadius: 4
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { beginAtZero: true, ticks: { color: colorGrey } },
+                        x: { ticks: { color: colorGrey } }
+                    } 
+                }
             });
         }
     }
@@ -239,7 +253,7 @@
 </script>
 
 <!-- Header -->
-<header class="bg-gradient-to-r from-[#1e3a5f] to-[#2563eb] text-white shadow-xl sticky top-0 z-40">
+<header class="bg-gradient-to-r from-[#003627] to-[#289543] text-white shadow-xl sticky top-0 z-40">
     <div class="container mx-auto px-4 py-4">
         <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="text-center lg:text-left">
@@ -247,16 +261,16 @@
                     <i class="fas fa-graduation-cap mr-2"></i>
                     Producción Científica 2025
                 </h1>
-                <p class="text-blue-200 text-sm">Carrera de Educación - UNESUM</p>
+                <p class="text-gray-200 text-sm">Carrera de Educación - UNESUM</p>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-center">
                     <div class="text-3xl font-bold">{totalPublicaciones}</div>
-                    <div class="text-xs text-blue-200">Publicaciones</div>
+                    <div class="text-xs text-gray-200">Publicaciones</div>
                 </div>
                 <div class="text-center">
                     <div class="text-3xl font-bold">{totalDocentes}</div>
-                    <div class="text-xs text-blue-200">Docentes</div>
+                    <div class="text-xs text-gray-200">Docentes</div>
                 </div>
             </div>
         </div>
@@ -266,8 +280,8 @@
 {#if loading}
     <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
-            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p class="text-gray-600">Cargando...</p>
+            <div class="w-12 h-12 border-4 border-[#289543] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-[#5A5B5E]">Cargando...</p>
         </div>
     </div>
 {/if}
@@ -276,11 +290,11 @@
     <!-- Gráficos al principio -->
     <section class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-md p-6">
-            <h3 class="font-semibold text-gray-800 mb-4"><i class="fas fa-chart-pie text-blue-500 mr-2"></i>Distribución por Tipo</h3>
+            <h3 class="font-semibold text-[#003627] mb-4"><i class="fas fa-chart-pie text-[#289543] mr-2"></i>Distribución por Tipo</h3>
             <div class="h-64"><canvas bind:this={canvasTipo}></canvas></div>
         </div>
         <div class="bg-white rounded-xl shadow-md p-6">
-            <h3 class="font-semibold text-gray-800 mb-4"><i class="fas fa-database text-green-500 mr-2"></i>Artículos por Base de Datos</h3>
+            <h3 class="font-semibold text-[#003627] mb-4"><i class="fas fa-database text-[#C12927] mr-2"></i>Artículos por Base de Datos</h3>
             <div class="h-64"><canvas bind:this={canvasBase}></canvas></div>
         </div>
     </section>
@@ -288,22 +302,22 @@
     <!-- Ranking Docentes -->
     <section class="mb-8">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-800">
-                <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+            <h2 class="text-xl font-bold text-[#003627]">
+                <i class="fas fa-trophy text-[#C12927] mr-2"></i>
                 Ranking de Docentes
             </h2>
-            <span class="text-sm text-gray-500">Click para filtrar publicaciones</span>
+            <span class="text-sm text-[#5A5B5E]">Click para filtrar publicaciones</span>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {#each topDocentes as docente, idx}
                 <div onclick={() => filterByDocente(docente.nombre)}
-                     class="bg-white rounded-xl p-4 shadow-md cursor-pointer border-2 transition-all hover:scale-[1.02] hover:shadow-lg {selectedDocente === docente.nombre ? 'border-blue-500 ring-2 ring-blue-200' : 'border-transparent hover:border-blue-200'}"
+                     class="bg-white rounded-xl p-4 shadow-md cursor-pointer border-2 transition-all hover:scale-[1.02] hover:shadow-lg {selectedDocente === docente.nombre ? 'border-[#289543] ring-2 ring-green-100' : 'border-transparent hover:border-gray-200'}"
                      role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && filterByDocente(docente.nombre)}>
                     
                     <div class="flex items-start gap-3">
                         <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold
-                             {idx === 0 ? 'bg-yellow-100' : idx === 1 ? 'bg-gray-100' : idx === 2 ? 'bg-orange-100' : 'bg-blue-50'}">
+                             {idx === 0 ? 'bg-yellow-100' : idx === 1 ? 'bg-gray-100' : idx === 2 ? 'bg-orange-100' : 'bg-green-50'}">
                             {#if idx === 0}
                                 <i class="fas fa-medal text-[#fbbf24]"></i>
                             {:else if idx === 1}
@@ -311,26 +325,26 @@
                             {:else if idx === 2}
                                 <i class="fas fa-medal text-[#d97706]"></i>
                             {:else}
-                                <span class="text-gray-500">{idx + 1}</span>
+                                <span class="text-[#5A5B5E]">{idx + 1}</span>
                             {/if}
                         </div>
                         
                         <div class="flex-1 min-w-0">
-                            <h3 class="font-semibold text-gray-800 text-sm truncate" title={docente.nombre}>{docente.nombre}</h3>
+                            <h3 class="font-semibold text-[#003627] text-sm truncate" title={docente.nombre}>{docente.nombre}</h3>
                             <div class="flex items-center gap-2 mt-2">
-                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800" title="Artículos">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-[#003627]" title="Artículos">
                                     <i class="fas fa-newspaper mr-1"></i>{docente.articulos}
                                 </span>
-                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800" title="Libros">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-[#C12927]" title="Libros">
                                     <i class="fas fa-book mr-1"></i>{docente.libros}
                                 </span>
-                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800" title="Capítulos">
+                                <span class="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-[#003627]" title="Capítulos">
                                     <i class="fas fa-bookmark mr-1"></i>{docente.capitulos}
                                 </span>
                             </div>
                             <div class="mt-2 text-right">
-                                <span class="text-lg font-bold text-gray-800">{docente.total}</span>
-                                <span class="text-xs text-gray-500">total</span>
+                                <span class="text-lg font-bold text-[#289543]">{docente.total}</span>
+                                <span class="text-xs text-[#5A5B5E]">total</span>
                             </div>
                         </div>
                     </div>
@@ -344,34 +358,34 @@
         <div class="flex flex-wrap items-center gap-4">
             <div class="flex-1 min-w-64">
                 <div class="relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#5A5B5E]"></i>
                     <input type="text" bind:value={searchQuery}
                            placeholder="Buscar por título, autor, revista..."
-                           class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                           class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-[#5A5B5E]">
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
                 <button onclick={() => filterTipo = 'todos'} class="px-4 py-2 rounded-lg text-sm font-medium transition
-                        {filterTipo === 'todos' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                        {filterTipo === 'todos' ? 'bg-[#003627] text-white' : 'bg-gray-100 text-[#5A5B5E] hover:bg-gray-200'}">
                     Todos
                 </button>
                 <button onclick={() => toggleTipoFilter('articulo')} class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
-                        {filterTipo === 'articulo' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'}">
+                        {filterTipo === 'articulo' ? 'bg-[#289543] text-white' : 'bg-green-50 text-[#289543] hover:bg-green-100'}">
                     <i class="fas fa-newspaper"></i> Artículos <span class="bg-white/20 px-1.5 rounded">{conteoArticulos}</span>
                 </button>
                 <button onclick={() => toggleTipoFilter('libro')} class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
-                        {filterTipo === 'libro' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-700 hover:bg-green-100'}">
+                        {filterTipo === 'libro' ? 'bg-[#C12927] text-white' : 'bg-red-50 text-[#C12927] hover:bg-red-100'}">
                     <i class="fas fa-book"></i> Libros <span class="bg-white/20 px-1.5 rounded">{conteoLibros}</span>
                 </button>
                 <button onclick={() => toggleTipoFilter('capitulo')} class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
-                        {filterTipo === 'capitulo' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'}">
+                        {filterTipo === 'capitulo' ? 'bg-[#003627] text-white' : 'bg-gray-200 text-[#003627] hover:bg-gray-300'}">
                     <i class="fas fa-bookmark"></i> Capítulos <span class="bg-white/20 px-1.5 rounded">{conteoCapitulos}</span>
                 </button>
             </div>
             
             <select bind:value={selectedDocente}
-                    class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                    class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-sm text-[#5A5B5E]">
                 <option value="">Todos los docentes</option>
                 {#each listaDocentes as docente}
                     <option value={docente}>{docente}</option>
@@ -380,7 +394,7 @@
             
             {#if hasActiveFilters}
                 <button onclick={clearFilters}
-                        class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium">
+                        class="px-4 py-2 text-[#C12927] hover:bg-red-50 rounded-lg text-sm font-medium">
                     <i class="fas fa-times mr-1"></i> Limpiar
                 </button>
             {/if}
@@ -388,10 +402,10 @@
         
         {#if selectedDocente}
             <div class="mt-3 flex items-center gap-2">
-                <span class="text-sm text-gray-500">Filtrando:</span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm">
+                <span class="text-sm text-[#5A5B5E]">Filtrando:</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-[#003627] text-sm">
                     <i class="fas fa-user mr-2"></i>{selectedDocente}
-                    <button onclick={() => selectedDocente = ''} class="ml-2"><i class="fas fa-times"></i></button>
+                    <button onclick={() => selectedDocente = ''} class="ml-2 hover:text-[#C12927]"><i class="fas fa-times"></i></button>
                 </span>
             </div>
         {/if}
@@ -400,7 +414,7 @@
     <!-- Resultados -->
     <section>
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-800">
+            <h2 class="text-lg font-semibold text-[#003627]">
                 <span>{publicacionesFiltradas.length}</span> publicaciones encontradas
             </h2>
         </div>
@@ -408,23 +422,23 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {#each publicacionesFiltradas as pub (pub.id)}
                 <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 transition-all hover:bg-gray-50
-                     {pub.tipo === 'articulo' ? 'border-blue-500' : pub.tipo === 'libro' ? 'border-green-500' : 'border-purple-500'}">
+                     {pub.tipo === 'articulo' ? 'border-[#289543]' : pub.tipo === 'libro' ? 'border-[#C12927]' : 'border-[#003627]'}">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="px-2 py-0.5 rounded text-xs font-medium
-                                      {pub.tipo === 'articulo' ? 'bg-blue-100 text-blue-800' : pub.tipo === 'libro' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                                      {pub.tipo === 'articulo' ? 'bg-green-100 text-[#003627]' : pub.tipo === 'libro' ? 'bg-red-100 text-[#C12927]' : 'bg-gray-200 text-[#003627]'}">
                                     <i class="mr-1 {pub.tipo === 'articulo' ? 'fas fa-newspaper' : pub.tipo === 'libro' ? 'fas fa-book' : 'fas fa-bookmark'}"></i>
                                     {pub.tipoLabel}
                                 </span>
                                 {#if pub.baseDatos}
-                                    <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">{pub.baseDatos}</span>
+                                    <span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-[#5A5B5E]">{pub.baseDatos}</span>
                                 {/if}
                             </div>
                             
-                            <h3 class="font-semibold text-gray-900 mb-2">{pub.titulo}</h3>
+                            <h3 class="font-semibold text-[#003627] mb-2">{pub.titulo}</h3>
                             
-                            <div class="text-sm text-gray-600 space-y-1">
+                            <div class="text-sm text-[#5A5B5E] space-y-1">
                                 {#if pub.revista}
                                     <p><i class="fas fa-journal-whills w-5 text-gray-400"></i> {pub.revista}</p>
                                 {/if}
@@ -444,7 +458,7 @@
                         {#if pub.link}
                             <div class="flex-shrink-0">
                                 <a href={pub.link} target="_blank" rel="noopener noreferrer"
-                                   class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                   class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-50 text-[#289543] hover:bg-[#289543] hover:text-white transition"
                                    title="Ver publicación">
                                     <i class="fas fa-external-link-alt"></i>
                                 </a>
@@ -454,7 +468,7 @@
                     
                     {#if pub.proyecto}
                         <div class="mt-3 pt-3 border-t border-gray-100">
-                            <p class="text-xs text-gray-500"><i class="fas fa-project-diagram mr-1"></i> Proyecto: <span class="text-gray-700">{pub.proyecto}</span></p>
+                            <p class="text-xs text-[#5A5B5E]"><i class="fas fa-project-diagram mr-1"></i> Proyecto: <span class="text-gray-700">{pub.proyecto}</span></p>
                         </div>
                     {/if}
                 </div>
@@ -464,8 +478,8 @@
         {#if publicacionesFiltradas.length === 0}
             <div class="text-center py-12 bg-white rounded-xl">
                 <i class="fas fa-search text-gray-300 text-5xl mb-4"></i>
-                <p class="text-gray-500">No se encontraron publicaciones</p>
-                <button onclick={clearFilters} class="mt-4 text-blue-600 hover:underline">Limpiar filtros</button>
+                <p class="text-[#5A5B5E]">No se encontraron publicaciones</p>
+                <button onclick={clearFilters} class="mt-4 text-[#C12927] hover:underline">Limpiar filtros</button>
             </div>
         {/if}
     </section>
