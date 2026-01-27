@@ -261,7 +261,7 @@
                     <i class="fas fa-graduation-cap mr-2"></i>
                     Producción Científica 2025
                 </h1>
-                <p class="text-gray-200 text-xs lg:text-sm">Carrera de Educación - UNESUM</p>
+                <p class="text-gray-200 text-xs lg:text-sm">Carrera Educación - UNESUM</p>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-center">
@@ -489,6 +489,7 @@
     <div class="container mx-auto px-4 text-center">
         <p><i class="fas fa-university mr-2"></i>Universidad Estatal del Sur de Manabí</p>
         <p class="text-sm mt-1">Facultad de Ciencias Sociales, Humanísticas y de la Educación</p>
+        <p class="text-sm mt-2"><i class="fas fa-envelope mr-2"></i>paul.amen@unesum.edu.ec</p>
     </div>
 </footer>
 
