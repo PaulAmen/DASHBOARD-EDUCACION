@@ -8,8 +8,24 @@ import '../styles/global.css';
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Producción Científica - Carrera de Educación UNESUM 2025</title>
+		<title>Producción Científica - Carrera Educación UNESUM 2025</title>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        
+        <!-- Open Graph / Facebook / WhatsApp -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={Astro.site} />
+        <meta property="og:title" content="Producción Científica - Carrera Educación UNESUM" />
+        <meta property="og:description" content="Dashboard interactivo de artículos, libros y capítulos. Visualiza el impacto científico de nuestra carrera." />
+        <meta property="og:image" content={new URL('social-preview.png', Astro.site)} />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={Astro.site} />
+        <meta property="twitter:title" content="Producción Científica - Carrera Educación UNESUM" />
+        <meta property="twitter:description" content="Dashboard interactivo de artículos, libros y capítulos. Visualiza el impacto científico de nuestra carrera." />
+        <meta property="twitter:image" content={new URL('social-preview.png', Astro.site)} />
+        
+        <meta name="theme-color" content="#003627" />
 	</head>
 	<body class="bg-gray-50 min-h-screen">
 		<slot />
