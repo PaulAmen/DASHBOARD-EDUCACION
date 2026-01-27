@@ -257,20 +257,20 @@
     <div class="container mx-auto px-4 py-4">
         <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="text-center lg:text-left">
-                <h1 class="text-xl lg:text-2xl font-bold">
+                <h1 class="text-lg lg:text-2xl font-bold">
                     <i class="fas fa-graduation-cap mr-2"></i>
                     Producción Científica 2025
                 </h1>
-                <p class="text-gray-200 text-sm">Carrera de Educación - UNESUM</p>
+                <p class="text-gray-200 text-xs lg:text-sm">Carrera de Educación - UNESUM</p>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-center">
-                    <div class="text-3xl font-bold">{totalPublicaciones}</div>
-                    <div class="text-xs text-gray-200">Publicaciones</div>
+                    <div class="text-2xl lg:text-3xl font-bold">{totalPublicaciones}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-200">Publicaciones</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-3xl font-bold">{totalDocentes}</div>
-                    <div class="text-xs text-gray-200">Docentes</div>
+                    <div class="text-2xl lg:text-3xl font-bold">{totalDocentes}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-200">Docentes</div>
                 </div>
             </div>
         </div>
@@ -331,7 +331,7 @@
                         
                         <div class="flex-1 min-w-0">
                             <h3 class="font-semibold text-[#003627] text-sm truncate" title={docente.nombre}>{docente.nombre}</h3>
-                            <div class="flex items-center gap-2 mt-2">
+                            <div class="flex flex-wrap items-center gap-2 mt-2">
                                 <span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-[#003627]" title="Artículos">
                                     <i class="fas fa-newspaper mr-1"></i>{docente.articulos}
                                 </span>
@@ -355,37 +355,37 @@
 
     <!-- Filtros -->
     <section class="bg-white rounded-xl shadow-md p-4 mb-6 sticky top-20 z-30">
-        <div class="flex flex-wrap items-center gap-4">
-            <div class="flex-1 min-w-64">
+        <div class="flex flex-col md:flex-row items-center gap-4">
+            <div class="w-full md:flex-1 md:min-w-64">
                 <div class="relative">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#5A5B5E]"></i>
                     <input type="text" bind:value={searchQuery}
-                           placeholder="Buscar por título, autor, revista..."
+                           placeholder="Buscar por título, autor..."
                            class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-[#5A5B5E]">
                 </div>
             </div>
             
-            <div class="flex items-center gap-2">
-                <button onclick={() => filterTipo = 'todos'} class="px-4 py-2 rounded-lg text-sm font-medium transition
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-center md:justify-start">
+                <button onclick={() => filterTipo = 'todos'} class="px-3 py-2 rounded-lg text-sm font-medium transition flex-grow md:flex-grow-0 text-center
                         {filterTipo === 'todos' ? 'bg-[#003627] text-white' : 'bg-gray-100 text-[#5A5B5E] hover:bg-gray-200'}">
                     Todos
                 </button>
-                <button onclick={() => toggleTipoFilter('articulo')} class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
+                <button onclick={() => toggleTipoFilter('articulo')} class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 flex-grow md:flex-grow-0
                         {filterTipo === 'articulo' ? 'bg-[#289543] text-white' : 'bg-green-50 text-[#289543] hover:bg-green-100'}">
                     <i class="fas fa-newspaper"></i> Artículos <span class="bg-white/20 px-1.5 rounded">{conteoArticulos}</span>
                 </button>
-                <button onclick={() => toggleTipoFilter('libro')} class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
+                <button onclick={() => toggleTipoFilter('libro')} class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 flex-grow md:flex-grow-0
                         {filterTipo === 'libro' ? 'bg-[#C12927] text-white' : 'bg-red-50 text-[#C12927] hover:bg-red-100'}">
                     <i class="fas fa-book"></i> Libros <span class="bg-white/20 px-1.5 rounded">{conteoLibros}</span>
                 </button>
-                <button onclick={() => toggleTipoFilter('capitulo')} class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2
+                <button onclick={() => toggleTipoFilter('capitulo')} class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 flex-grow md:flex-grow-0
                         {filterTipo === 'capitulo' ? 'bg-[#003627] text-white' : 'bg-gray-200 text-[#003627] hover:bg-gray-300'}">
                     <i class="fas fa-bookmark"></i> Capítulos <span class="bg-white/20 px-1.5 rounded">{conteoCapitulos}</span>
                 </button>
             </div>
             
             <select bind:value={selectedDocente}
-                    class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-sm text-[#5A5B5E]">
+                    class="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-sm text-[#5A5B5E]">
                 <option value="">Todos los docentes</option>
                 {#each listaDocentes as docente}
                     <option value={docente}>{docente}</option>
@@ -394,7 +394,7 @@
             
             {#if hasActiveFilters}
                 <button onclick={clearFilters}
-                        class="px-4 py-2 text-[#C12927] hover:bg-red-50 rounded-lg text-sm font-medium">
+                        class="w-full md:w-auto px-4 py-2 text-[#C12927] hover:bg-red-50 rounded-lg text-sm font-medium text-center">
                     <i class="fas fa-times mr-1"></i> Limpiar
                 </button>
             {/if}
