@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producción Científica - Carrera de Educación UNESUM 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        .gradient-header { background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%); }
+        .docente-card { transition: all 0.3s ease; }
+        .docente-card:hover { transform: scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .medal-gold { color: #fbbf24; }
+        .medal-silver { color: #9ca3af; }
+        .medal-bronze { color: #d97706; }
+        .pub-card { transition: all 0.2s ease; border-left: 4px solid transparent; }
+        .pub-card:hover { background: #f8fafc; }
+        .pub-card.articulo { border-left-color: #3b82f6; }
+        .pub-card.libro { border-left-color: #22c55e; }
+        .pub-card.capitulo { border-left-color: #a855f7; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen" x-data="dashboard()" x-init="init()">
+    
+    <!-- Header -->
+    <header class="gradient-header text-white shadow-xl sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div class="text-center lg:text-left">
+                    <h1 class="text-xl lg:text-2xl font-bold">
+                        <i class="fas fa-graduation-cap mr-2"></i>
+                        Producción Científica 2025
+                    </h1>
+                    <p class="text-blue-200 text-sm">Carrera de Educación - UNESUM</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold" x-text="totalPublicaciones"></div>
+                        <div class="text-xs text-blue-200">Publicaciones</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold" x-text="totalDocentes"></div>
+                        <div class="text-xs text-blue-200">Docentes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading -->
+    <div x-show="loading" x-cloak class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
+            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-gray-600">Cargando...</p>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-6">
+        
+        <!-- TOP DOCENTES -->
+        <section class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                    Ranking de Docentes
+                </h2>
+                <span class="text-sm text-gray-500">Click para filtrar publicaciones</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <template x-for="(docente, idx) in topDocentes" :key="docente.nombre">
+                    <div @click="filterByDocente(docente.nombre)"
+                         class="docente-card bg-white rounded-xl p-4 shadow-md cursor-pointer border-2"
+                         :class="selectedDocente === docente.nombre ? 'border-blue-500 ring-2 ring-blue-200' : 'border-transparent hover:border-blue-200'">
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold"
+                                 :class="{'bg-yellow-100': idx===0, 'bg-gray-100': idx===1, 'bg-orange-100': idx===2, 'bg-blue-50': idx>2}">
+                                <i x-show="idx === 0" class="fas fa-medal medal-gold"></i>
+                                <i x-show="idx === 1" class="fas fa-medal medal-silver"></i>
+                                <i x-show="idx === 2" class="fas fa-medal medal-bronze"></i>
+                                <span x-show="idx > 2" class="text-gray-500" x-text="idx + 1"></span>
+                            </div>
+                            
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-gray-800 text-sm truncate" x-text="docente.nombre" :title="docente.nombre"></h3>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800" :title="'Artículos'">
+                                        <i class="fas fa-newspaper mr-1"></i><span x-text="docente.articulos"></span>
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800" :title="'Libros'">
+                                        <i class="fas fa-book mr-1"></i><span x-text="docente.libros"></span>
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800" :title="'Capítulos'">
+                                        <i class="fas fa-bookmark mr-1"></i><span x-text="docente.capitulos"></span>
+                                    </span>
+                                </div>
+                                <div class="mt-2 text-right">
+                                    <span class="text-lg font-bold text-gray-800" x-text="docente.total"></span>
+                                    <span class="text-xs text-gray-500">total</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+
+        <!-- FILTROS -->
+        <section class="bg-white rounded-xl shadow-md p-4 mb-6 sticky top-20 z-30">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex-1 min-w-64">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" x-model="searchQuery" @input="applyFilters()"
+                               placeholder="Buscar por título, autor, revista..."
+                               class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button @click="toggleTipoFilter('todos')" class="px-4 py-2 rounded-lg text-sm font-medium transition"
+                            :class="filterTipo === 'todos' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                        Todos
+                    </button>
+                    <button @click="toggleTipoFilter('articulo')" class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2"
+                            :class="filterTipo === 'articulo' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'">
+                        <i class="fas fa-newspaper"></i> Artículos <span class="bg-white/20 px-1.5 rounded" x-text="conteoArticulos"></span>
+                    </button>
+                    <button @click="toggleTipoFilter('libro')" class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2"
+                            :class="filterTipo === 'libro' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-700 hover:bg-green-100'">
+                        <i class="fas fa-book"></i> Libros <span class="bg-white/20 px-1.5 rounded" x-text="conteoLibros"></span>
+                    </button>
+                    <button @click="toggleTipoFilter('capitulo')" class="px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2"
+                            :class="filterTipo === 'capitulo' ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'">
+                        <i class="fas fa-bookmark"></i> Capítulos <span class="bg-white/20 px-1.5 rounded" x-text="conteoCapitulos"></span>
+                    </button>
+                </div>
+                
+                <select x-model="selectedDocente" @change="applyFilters()"
+                        class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                    <option value="">Todos los docentes</option>
+                    <template x-for="docente in listaDocentes" :key="docente">
+                        <option :value="docente" x-text="docente"></option>
+                    </template>
+                </select>
+                
+                <button x-show="hasActiveFilters" @click="clearFilters()"
+                        class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium">
+                    <i class="fas fa-times mr-1"></i> Limpiar
+                </button>
+            </div>
+            
+            <div x-show="selectedDocente" class="mt-3 flex items-center gap-2">
+                <span class="text-sm text-gray-500">Filtrando:</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm">
+                    <i class="fas fa-user mr-2"></i><span x-text="selectedDocente"></span>
+                    <button @click="selectedDocente = ''; applyFilters()" class="ml-2"><i class="fas fa-times"></i></button>
+                </span>
+            </div>
+        </section>
+
+        <!-- RESULTADOS -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">
+                    <span x-text="publicacionesFiltradas.length"></span> publicaciones encontradas
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <template x-for="pub in publicacionesFiltradas" :key="pub.id">
+                    <div class="pub-card bg-white rounded-xl p-5 shadow-sm" :class="pub.tipo">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="px-2 py-0.5 rounded text-xs font-medium"
+                                          :class="{'bg-blue-100 text-blue-800': pub.tipo==='articulo', 'bg-green-100 text-green-800': pub.tipo==='libro', 'bg-purple-100 text-purple-800': pub.tipo==='capitulo'}">
+                                        <i :class="{'fas fa-newspaper': pub.tipo==='articulo', 'fas fa-book': pub.tipo==='libro', 'fas fa-bookmark': pub.tipo==='capitulo'}" class="mr-1"></i>
+                                        <span x-text="pub.tipoLabel"></span>
+                                    </span>
+                                    <span x-show="pub.baseDatos" class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700" x-text="pub.baseDatos"></span>
+                                </div>
+                                
+                                <h3 class="font-semibold text-gray-900 mb-2" x-text="pub.titulo"></h3>
+                                
+                                <div class="text-sm text-gray-600 space-y-1">
+                                    <p x-show="pub.revista"><i class="fas fa-journal-whills w-5 text-gray-400"></i> <span x-text="pub.revista"></span></p>
+                                    <p x-show="pub.isbn"><i class="fas fa-barcode w-5 text-gray-400"></i> ISBN: <span x-text="pub.isbn"></span></p>
+                                    <p x-show="pub.libroPadre" class="text-xs"><i class="fas fa-book w-5 text-gray-400"></i> En: <span x-text="pub.libroPadre" class="italic"></span></p>
+                                    <p><i class="fas fa-user w-5 text-gray-400"></i> <span x-text="pub.autor" class="font-medium"></span></p>
+                                    <p x-show="pub.fecha"><i class="fas fa-calendar w-5 text-gray-400"></i> <span x-text="pub.fecha"></span></p>
+                                </div>
+                            </div>
+                            
+                            <div x-show="pub.link" class="flex-shrink-0">
+                                <a :href="pub.link" target="_blank"
+                                   class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                   title="Ver publicación">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div x-show="pub.proyecto" class="mt-3 pt-3 border-t border-gray-100">
+                            <p class="text-xs text-gray-500"><i class="fas fa-project-diagram mr-1"></i> Proyecto: <span x-text="pub.proyecto" class="text-gray-700"></span></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <div x-show="publicacionesFiltradas.length === 0" class="text-center py-12 bg-white rounded-xl">
+                <i class="fas fa-search text-gray-300 text-5xl mb-4"></i>
+                <p class="text-gray-500">No se encontraron publicaciones</p>
+                <button @click="clearFilters()" class="mt-4 text-blue-600 hover:underline">Limpiar filtros</button>
+            </div>
+        </section>
+
+        <!-- Gráficos -->
+        <section class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="font-semibold text-gray-800 mb-4"><i class="fas fa-chart-pie text-blue-500 mr-2"></i>Distribución por Tipo</h3>
+                <div class="h-64"><canvas id="chartTipo"></canvas></div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="font-semibold text-gray-800 mb-4"><i class="fas fa-database text-green-500 mr-2"></i>Artículos por Base de Datos</h3>
+                <div class="h-64"><canvas id="chartBase"></canvas></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p><i class="fas fa-university mr-2"></i>Universidad Estatal del Sur de Manabí</p>
+            <p class="text-sm mt-1">Facultad de Ciencias Sociales, Humanísticas y de la Educación</p>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // CONFIGURACIÓN - CAMBIAR ESTA URL
+        // ============================================
+        const API_URL = 'TU_WEB_APP_URL_AQUI';
+        const USE_API = false; // Cambiar a true cuando tengas el API desplegado
+
+        function dashboard() {
+            return {
+                loading: true, 
+                searchQuery: '', 
+                filterTipo: 'todos', 
+                selectedDocente: '',
+                publicaciones: [], 
+                publicacionesFiltradas: [], 
+                topDocentes: [], 
+                listaDocentes: [],
+                chartTipo: null, 
+                chartBase: null,
+
+                get totalPublicaciones() { return this.publicaciones.length; },
+                get totalDocentes() { return this.topDocentes.length; },
+                get conteoArticulos() { return this.publicaciones.filter(p => p.tipo === 'articulo').length; },
+                get conteoLibros() { return this.publicaciones.filter(p => p.tipo === 'libro').length; },
+                get conteoCapitulos() { return this.publicaciones.filter(p => p.tipo === 'capitulo').length; },
+                get hasActiveFilters() { return this.searchQuery || this.filterTipo !== 'todos' || this.selectedDocente; },
+
+                async init() { 
+                    await this.loadData(); 
+                },
+
+                async loadData() {
+                    this.loading = true;
+                    
+                    try {
+                        let data;
+                        
+                        if (USE_API) {
+                            // Cargar desde la API
+                            const response = await fetch(API_URL + '?action=dashboard');
+                            data = await response.json();
+                            
+                            // Procesar datos de la API
+                            this.topDocentes = data.docentes || [];
+                            this.publicaciones = [];
+                            
+                            // Convertir artículos
+                            (data.publicaciones?.articulos || []).forEach(a => {
+                                this.publicaciones.push({
+                                    ...a,
+                                    tipo: 'articulo',
+                                    tipoLabel: 'Artículo'
+                                });
+                            });
+                            
+                            // Convertir libros
+                            (data.publicaciones?.libros || []).forEach(l => {
+                                this.publicaciones.push({
+                                    ...l,
+                                    tipo: 'libro',
+                                    tipoLabel: 'Libro'
+                                });
+                            });
+                            
+                            // Convertir capítulos
+                            (data.publicaciones?.capitulos || []).forEach(c => {
+                                this.publicaciones.push({
+                                    ...c,
+                                    tipo: 'capitulo',
+                                    tipoLabel: 'Capítulo'
+                                });
+                            });
+                        } else {
+                            // Usar datos de demostración
+                            await new Promise(r => setTimeout(r, 300));
+                            this.loadDemoData();
+                        }
+                        
+                        this.listaDocentes = this.topDocentes.map(d => d.nombre);
+                        this.applyFilters();
+                        this.$nextTick(() => this.createCharts());
+                        
+                    } catch (error) {
+                        console.error('Error cargando datos:', error);
+                        this.loadDemoData();
+                        this.applyFilters();
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                loadDemoData() {
+                    // Datos de demostración
+                    this.topDocentes = [
+                        { nombre: "SOLÓRZANO ÁLAVA WILTER LEONEL", articulos: 2, libros: 1, capitulos: 1, total: 4 },
+                        { nombre: "GARCÍA MACÍAS VANESSA MARIUXI", articulos: 1, libros: 1, capitulos: 1, total: 3 },
+                        { nombre: "AMEN MORA PAUL GEOVANNY", articulos: 2, libros: 0, capitulos: 1, total: 3 },
+                        { nombre: "HIDALGO TUMBACO VANESSA VALERIA", articulos: 1, libros: 1, capitulos: 0, total: 2 },
+                        { nombre: "PISCO RODRÍGUEZ LILIANA VANESSA", articulos: 1, libros: 1, capitulos: 0, total: 2 },
+                        { nombre: "ALVAREZ VILLACRESES BRENDA MARIAN", articulos: 1, libros: 1, capitulos: 0, total: 2 },
+                        { nombre: "VILLAMAR PONCE JOSÉ LUIS", articulos: 1, libros: 1, capitulos: 0, total: 2 },
+                        { nombre: "TUMBACO FIGUEROA GINA PATRICIA", articulos: 1, libros: 0, capitulos: 0, total: 1 },
+                        { nombre: "INTRIAGO TERÁN ANA BELÉN", articulos: 1, libros: 0, capitulos: 0, total: 1 },
+                        { nombre: "MORÁN LOZANO NOE SALOMÓN", articulos: 1, libros: 0, capitulos: 0, total: 1 },
+                    ];
+                    
+                    this.publicaciones = [
+                        { id: 'A1', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "ESTRATEGIA DIDÁCTICA PARTICIPATIVA PARA LA ENSEÑANZA DE LAS CIENCIAS NATURALES", autor: "TUMBACO FIGUEROA GINA PATRICIA", revista: "Revista Científica ALCÓN", baseDatos: "ERIHPLUS", fecha: "08/12/2025", link: "https://soeici.org/index.php/alcon/article/view/867" },
+                        { id: 'A2', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "ALFABETIZACIÓN DIGITAL ACTIVA: UN ENFOQUE PARA EL APRENDIZAJE", autor: "HIDALGO TUMBACO VANESSA VALERIA", revista: "Revista Científica ALCÓN", baseDatos: "ERIHPLUS", fecha: "08/12/2025", link: "https://soeici.org/index.php/alcon/article/view/867" },
+                        { id: 'A3', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "MODELO ESTADÍSTICO COMPUTACIONAL PARA ANÁLISIS PREDICTIVO DEL RENDIMIENTO", autor: "ALVAREZ VILLACRESES BRENDA MARIAN", revista: "Serie Científica UCI", baseDatos: "SCIELO", fecha: "31/12/2025", link: "https://publicaciones.uci.cu/index.php/serie/article/view/2017" },
+                        { id: 'A4', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "MÉTODO PARA MEDIR LA EFECTIVIDAD DE LA GAMIFICACIÓN", autor: "SOLÓRZANO ÁLAVA WILTER LEONEL", revista: "Serie Científica UCI", baseDatos: "SCIELO", fecha: "01/01/2026", link: "https://publicaciones.uci.cu/index.php/serie/article/view/1962" },
+                        { id: 'A5', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "INTELIGENCIA ARTIFICIAL EN EDUCACIÓN: OPORTUNIDADES Y DESAFÍOS ÉTICOS", autor: "AMEN MORA PAUL GEOVANNY", revista: "Prisma Journal", baseDatos: "LATINDEX", fecha: "12/01/2025", link: "" },
+                        { id: 'A6', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "INTEGRACIÓN DE LABORATORIOS VIRTUALES PARA ENSEÑANZA DE QUÍMICA", autor: "AMEN MORA PAUL GEOVANNY", revista: "Revista EduSciences", baseDatos: "LATINDEX DIR", fecha: "03/01/2026", link: "" },
+                        { id: 'A7', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "ESTRATEGIAS METODOLÓGICAS PARA EL PENSAMIENTO CRÍTICO", autor: "GARCÍA MACÍAS VANESSA MARIUXI", revista: "Revista Científica ALCÓN", baseDatos: "ERIHPLUS", fecha: "15/12/2025", link: "https://soeici.org/index.php/alcon" },
+                        { id: 'A8', tipo: 'articulo', tipoLabel: 'Artículo', titulo: "INNOVACIÓN PEDAGÓGICA EN LA FORMACIÓN DOCENTE", autor: "SOLÓRZANO ÁLAVA WILTER LEONEL", revista: "Serie Científica UCI", baseDatos: "SCIELO", fecha: "09/01/2026", link: "https://publicaciones.uci.cu/index.php/serie" },
+                        { id: 'L1', tipo: 'libro', tipoLabel: 'Libro', titulo: "Formación integral: Eje transversal en la Carrera Educación", autor: "SOLÓRZANO ÁLAVA WILTER LEONEL", isbn: "978-9942-7435-6-5", fecha: "23/12/2025", link: "https://editorialalema.org/libros/index.php/alema/article/view/61" },
+                        { id: 'L2', tipo: 'libro', tipoLabel: 'Libro', titulo: "Formación integral: Eje transversal en la Carrera Educación", autor: "PISCO RODRÍGUEZ LILIANA VANESSA", isbn: "978-9942-7435-6-5", fecha: "23/12/2025", link: "https://editorialalema.org/libros/index.php/alema/article/view/61" },
+                        { id: 'L3', tipo: 'libro', tipoLabel: 'Libro', titulo: "Formación integral: Eje transversal en la Carrera Educación", autor: "GARCÍA MACÍAS VANESSA MARIUXI", isbn: "978-9942-7435-6-5", fecha: "23/12/2025", link: "https://editorialalema.org/libros/index.php/alema/article/view/61" },
+                        { id: 'L4', tipo: 'libro', tipoLabel: 'Libro', titulo: "Formación integral: Eje transversal en la Carrera Educación", autor: "HIDALGO TUMBACO VANESSA VALERIA", isbn: "978-9942-7435-6-5", fecha: "23/12/2025", link: "https://editorialalema.org/libros/index.php/alema/article/view/61" },
+                        { id: 'L5', tipo: 'libro', tipoLabel: 'Libro', titulo: "Formación integral: Eje transversal en la Carrera Educación", autor: "ALVAREZ VILLACRESES BRENDA MARIAN", isbn: "978-9942-7435-6-5", fecha: "23/12/2025", link: "https://editorialalema.org/libros/index.php/alema/article/view/61" },
+                        { id: 'L6', tipo: 'libro', tipoLabel: 'Libro', titulo: "Formación integral: Eje transversal en la Carrera Educación", autor: "VILLAMAR PONCE JOSÉ LUIS", isbn: "978-9942-7435-6-5", fecha: "23/12/2025", link: "https://editorialalema.org/libros/index.php/alema/article/view/61" },
+                        { id: 'C1', tipo: 'capitulo', tipoLabel: 'Capítulo', titulo: "Introducción a la Gestión Organizacional en Instituciones Educativas", libroPadre: "Gestión Organizacional - Zona Sur de Manabí", autor: "GARCÍA MACÍAS VANESSA MARIUXI", isbn: "978-9942-579-13-3", fecha: "06/01/2026" },
+                        { id: 'C2', tipo: 'capitulo', tipoLabel: 'Capítulo', titulo: "Teorías y Modelos de Gestión Organizacional", libroPadre: "Gestión Organizacional - Zona Sur de Manabí", autor: "SOLÓRZANO ÁLAVA WILTER LEONEL", isbn: "978-9942-579-13-3", fecha: "06/01/2026" },
+                        { id: 'C3', tipo: 'capitulo', tipoLabel: 'Capítulo', titulo: "Impacto de la gestión organizacional en la formación integral", libroPadre: "Gestión Organizacional - Zona Sur de Manabí", autor: "AMEN MORA PAUL GEOVANNY", isbn: "978-9942-579-13-3", fecha: "06/01/2026" },
+                    ];
+                    
+                    this.listaDocentes = this.topDocentes.map(d => d.nombre);
+                },
+
+                applyFilters() {
+                    let resultado = [...this.publicaciones];
+                    if (this.filterTipo !== 'todos') resultado = resultado.filter(p => p.tipo === this.filterTipo);
+                    if (this.selectedDocente) resultado = resultado.filter(p => p.autor === this.selectedDocente);
+                    if (this.searchQuery) {
+                        const q = this.searchQuery.toLowerCase();
+                        resultado = resultado.filter(p => 
+                            (p.titulo || '').toLowerCase().includes(q) ||
+                            (p.autor || '').toLowerCase().includes(q) ||
+                            (p.revista || '').toLowerCase().includes(q) ||
+                            (p.libroPadre || '').toLowerCase().includes(q)
+                        );
+                    }
+                    this.publicacionesFiltradas = resultado;
+                },
+
+                toggleTipoFilter(tipo) { this.filterTipo = tipo; this.applyFilters(); },
+                filterByDocente(nombre) { this.selectedDocente = this.selectedDocente === nombre ? '' : nombre; this.applyFilters(); },
+                clearFilters() { this.searchQuery = ''; this.filterTipo = 'todos'; this.selectedDocente = ''; this.applyFilters(); },
+
+                createCharts() {
+                    if (this.chartTipo) this.chartTipo.destroy();
+                    if (this.chartBase) this.chartBase.destroy();
+                    
+                    const ctxTipo = document.getElementById('chartTipo');
+                    if (ctxTipo) {
+                        this.chartTipo = new Chart(ctxTipo, {
+                            type: 'doughnut',
+                            data: { labels: ['Artículos', 'Libros', 'Capítulos'], datasets: [{ data: [this.conteoArticulos, this.conteoLibros, this.conteoCapitulos], backgroundColor: ['#3b82f6', '#22c55e', '#a855f7'], borderWidth: 0 }] },
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                        });
+                    }
+                    
+                    const bases = {};
+                    this.publicaciones.filter(p => p.tipo === 'articulo').forEach(p => { if (p.baseDatos) bases[p.baseDatos] = (bases[p.baseDatos] || 0) + 1; });
+                    
+                    const ctxBase = document.getElementById('chartBase');
+                    if (ctxBase) {
+                        this.chartBase = new Chart(ctxBase, {
+                            type: 'bar',
+                            data: { labels: Object.keys(bases), datasets: [{ label: 'Artículos', data: Object.values(bases), backgroundColor: ['#3b82f6', '#22c55e', '#f59e0b', '#a855f7'], borderRadius: 6 }] },
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                        });
+                    }
+                }
+            };
+        }
+    </script>
+</body>
+</html>
