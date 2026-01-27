@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import Chart from 'chart.js/auto';
+    import WordCloud from './WordCloud.svelte';
 
     // Config
     const API_URL = 'https://script.google.com/macros/s/AKfycby07gHaIc22g1AEnGSH4ht1WZ2bHx4OfbaX07w7tO26Lz5XxZ46LzXfouPCSNApzVH0/exec';
@@ -14,6 +15,7 @@
     let publicaciones = $state([]);
     let topDocentes = $state([]);
     let listaDocentes = $state([]);
+    let wordFreq = $state([]);
 
     // Charts
     let chartTipo;
@@ -133,6 +135,7 @@
 
             publicaciones = newPublicaciones;
             calculateRankings();
+            generateWordFreq();
             
             listaDocentes = topDocentes.map(d => d.nombre);
             setTimeout(createCharts, 100);
@@ -143,6 +146,27 @@
         } finally {
             loading = false;
         }
+    }
+
+    function generateWordFreq() {
+        const stopWords = new Set(['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u', 'de', 'del', 'a', 'al', 'en', 'con', 'por', 'para', 'su', 'sus', 'que', 'se', 'lo', 'si', 'no', 'esta', 'este', 'esto', 'como', 'entre', 'sobre', 'desde', 'hasta', 'durante', 'mediante', 'ante', 'bajo', 'tras', 'mediante', 'analisis', 'estudio', 'estrategia', 'investigacion', 'desarrollo', 'impacto', 'caso', 'proceso', 'univeridad', 'estatal', 'sur', 'manabi', 'educacion', 'carrera', 'docentes', 'estudiantes', 'instituciones', 'educativas']);
+        const counts = {};
+        
+        publicaciones.forEach(pub => {
+            const words = (pub.titulo || '').toLowerCase()
+                .replace(/[.,:;()!¡?¿]/g, '')
+                .split(/\s+/)
+                .filter(w => w.length > 3 && !stopWords.has(w));
+            
+            words.forEach(w => {
+                counts[w] = (counts[w] || 0) + 1;
+            });
+        });
+
+        wordFreq = Object.entries(counts)
+            .map(([text, size]) => ({ text: text.toUpperCase(), size }))
+            .sort((a, b) => b.size - a.size)
+            .slice(0, 40);
     }
 
     function calculateRankings() {
@@ -287,6 +311,18 @@
 {/if}
 
 <main class="container mx-auto px-4 py-6">
+    <!-- Nube de Palabras -->
+    <section class="mb-8">
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="font-semibold text-[#003627] mb-2 text-center">
+                <i class="fas fa-cloud text-[#289543] mr-2"></i>
+                Nube de Conceptos Clave
+            </h3>
+            <p class="text-center text-xs text-[#5A5B5E] mb-4 italic">Huella digital visual de nuestra producción científica</p>
+            <WordCloud words={wordFreq} />
+        </div>
+    </section>
+
     <!-- Gráficos al principio -->
     <section class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-md p-6">
