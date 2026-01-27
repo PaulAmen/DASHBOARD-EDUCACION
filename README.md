@@ -1,4 +1,4 @@
-# Dashboard de Producción Científica - UNESUM Educación 2025
+# Dashboard de Producción Científica - UNESUM Educación 2026
 
 Este proyecto visualiza la producción científica (artículos, libros y capítulos) de la carrera de Educación de la UNESUM.
 

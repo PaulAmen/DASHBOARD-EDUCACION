@@ -1,5 +1,5 @@
 /**
- * Dashboard Producción Científica - UNESUM Educación 2025
+ * Dashboard Producción Científica - UNESUM Educación 2026
  * Backend Google Apps Script - VERSIÓN OPTIMIZADA
  */
 
