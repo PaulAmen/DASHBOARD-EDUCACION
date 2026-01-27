@@ -6,8 +6,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://paulamen.github.io',
   integrations: [svelte()],
-
+  base: '/DASHBOARD-EDUCACION/',
   vite: {
     plugins: [tailwindcss()]
   }
