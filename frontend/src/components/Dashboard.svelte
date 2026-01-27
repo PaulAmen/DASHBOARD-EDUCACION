@@ -354,14 +354,14 @@
     </section>
 
     <!-- Filtros -->
-    <section class="bg-white rounded-xl shadow-md p-4 mb-6 sticky top-20 z-30">
+    <section class="bg-white rounded-xl shadow-md p-4 mb-6 sticky top-20 z-30 overflow-hidden">
         <div class="flex flex-col md:flex-row items-center gap-4">
-            <div class="w-full md:flex-1 md:min-w-64">
-                <div class="relative">
+            <div class="w-full md:flex-1 md:min-w-64 min-w-0">
+                <div class="relative w-full">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#5A5B5E]"></i>
                     <input type="text" bind:value={searchQuery}
-                           placeholder="Buscar por título, autor..."
-                           class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-[#5A5B5E]">
+                           placeholder="Buscar publicación..."
+                           class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-[#5A5B5E] text-sm truncate">
                 </div>
             </div>
             
