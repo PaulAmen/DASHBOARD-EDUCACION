@@ -300,18 +300,24 @@
     function filterByDocente(nombre) {
         selectedDocente = selectedDocente === nombre ? '' : nombre;
     }
+
+    const base = import.meta.env.BASE_URL;
 </script>
 
 <!-- Header -->
-<header class="bg-gradient-to-r from-[#003627] to-[#289543] text-white shadow-xl sticky top-0 z-40">
-    <div class="container mx-auto px-4 py-4">
+<header class="bg-gradient-to-r from-[#003627] via-[#004d37] to-[#289543] text-white shadow-xl sticky top-0 z-40 border-b-4 border-[#C12927]">
+    <div class="container mx-auto px-4 py-3">
         <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-            <div class="text-center lg:text-left">
-                <h1 class="text-lg lg:text-2xl font-bold">
-                    <i class="fas fa-graduation-cap mr-2"></i>
-                    Producción Científica 2026
-                </h1>
-                <p class="text-gray-200 text-xs lg:text-sm">Carrera Educación - UNESUM</p>
+            <div class="flex items-center gap-4 text-center lg:text-left">
+                <div class="bg-white p-1 rounded-sm shadow-sm">
+                    <img src="{base}carrera-educacion.png" alt="Logo Carrera Educación" class="h-12 lg:h-16 w-auto" />
+                </div>
+                <div>
+                    <h1 class="text-lg lg:text-2xl font-bold tracking-tight text-white drop-shadow-sm">
+                        Producción Científica 2026
+                    </h1>
+                    <p class="text-green-100 text-xs lg:text-sm font-medium">Carrera Educación - UNESUM</p>
+                </div>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-center">
@@ -467,7 +473,7 @@
                 <span class="text-sm text-[#5A5B5E]">Filtrando:</span>
                 <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-[#003627] text-sm">
                     <i class="fas fa-user mr-2"></i>{selectedDocente}
-                    <button onclick={() => selectedDocente = ''} class="ml-2 hover:text-[#C12927]"><i class="fas fa-times"></i></button>
+                    <button onclick={() => selectedDocente = ''} class="ml-2 hover:text-[#C12927]" aria-label="Quitar filtro de docente"><i class="fas fa-times"></i></button>
                 </span>
             </div>
         {/if}
@@ -547,11 +553,14 @@
     </section>
 </main>
 
-<footer class="bg-gray-800 text-gray-400 py-6 mt-12">
+<footer class="bg-[#003627] text-gray-200 py-8 mt-12 border-t-4 border-[#C12927]">
     <div class="container mx-auto px-4 text-center">
-        <p><i class="fas fa-university mr-2"></i>Universidad Estatal del Sur de Manabí</p>
+        <div class="flex justify-center mb-4">
+             <img src="{base}carrera-educacion.png" alt="Logo Carrera Educación" class="h-10 w-auto brightness-0 invert opacity-80" />
+        </div>
+        <p class="font-semibold text-white"><i class="fas fa-university mr-2"></i>Universidad Estatal del Sur de Manabí</p>
         <p class="text-sm mt-1">Facultad de Ciencias Sociales, Humanísticas y de la Educación</p>
-        <p class="text-sm mt-2"><i class="fas fa-envelope mr-2"></i>paul.amen@unesum.edu.ec</p>
+        <p class="text-sm mt-2 font-mono"><i class="fas fa-envelope mr-2 text-[#289543]"></i>paul.amen@unesum.edu.ec</p>
     </div>
 </footer>
 
