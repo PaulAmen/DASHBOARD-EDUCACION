@@ -52,6 +52,12 @@
         return resultado;
     });
 
+    let topDocentesFiltrados = $derived.by(() => {
+        if (!searchQuery) return topDocentes;
+        const q = searchQuery.toLowerCase();
+        return topDocentes.filter(d => d.nombre.toLowerCase().includes(q));
+    });
+
     onMount(async () => {
         await loadData();
     });
@@ -212,8 +218,10 @@
             if (pub.tipo === 'capitulo') docentes[nombre].capitulos++;
         });
 
-        // Convert to array and sort
-        topDocentes = Object.values(docentes).sort((a, b) => b.total - a.total);
+        // Convert to array and sort, then store original rank
+        topDocentes = Object.values(docentes)
+            .sort((a, b) => b.total - a.total)
+            .map((d, i) => ({ ...d, rank: i + 1 }));
     }
 
     function loadDemoData() {
@@ -453,7 +461,7 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {#each topDocentes as docente, idx}
+            {#each topDocentesFiltrados as docente (docente.nombre)}
                 <div onclick={() => filterByDocente(docente.nombre)}
                      class="bg-white rounded-xl p-4 shadow-md cursor-pointer border-2 transition-all duration-300
                      {selectedDocente === docente.nombre ? 'border-[#289543] ring-2 ring-green-100 scale-[1.03] z-10 shadow-lg' : (selectedDocente ? 'opacity-30 grayscale-[0.5] scale-[0.97]' : 'border-transparent hover:border-gray-200 hover:scale-[1.02] hover:shadow-lg')}"
@@ -461,15 +469,15 @@
                     
                     <div class="flex items-start gap-3">
                         <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold
-                             {idx === 0 ? 'bg-yellow-100' : idx === 1 ? 'bg-gray-100' : idx === 2 ? 'bg-orange-100' : 'bg-green-50'}">
-                            {#if idx === 0}
+                             {docente.rank === 1 ? 'bg-yellow-100' : docente.rank === 2 ? 'bg-gray-100' : docente.rank === 3 ? 'bg-orange-100' : 'bg-green-50'}">
+                            {#if docente.rank === 1}
                                 <i class="fas fa-medal text-[#fbbf24]"></i>
-                            {:else if idx === 1}
+                            {:else if docente.rank === 2}
                                 <i class="fas fa-medal text-[#9ca3af]"></i>
-                            {:else if idx === 2}
+                            {:else if docente.rank === 3}
                                 <i class="fas fa-medal text-[#d97706]"></i>
                             {:else}
-                                <span class="text-[#5A5B5E]">{idx + 1}</span>
+                                <span class="text-[#5A5B5E]">{docente.rank}</span>
                             {/if}
                         </div>
                         
