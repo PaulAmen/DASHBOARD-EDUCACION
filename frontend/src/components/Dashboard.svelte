@@ -34,7 +34,12 @@
     let publicacionesFiltradas = $derived.by(() => {
         let resultado = [...publicaciones];
         if (filterTipo !== 'todos') resultado = resultado.filter(p => p.tipo === filterTipo);
-        if (selectedDocente) resultado = resultado.filter(p => p.autor === selectedDocente);
+        if (selectedDocente) {
+            resultado = resultado.filter(p => 
+                p.autor === selectedDocente || 
+                (p.autor || '').split(' / ').some(a => a.trim() === selectedDocente)
+            );
+        }
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
             resultado = resultado.filter(p => 
@@ -77,8 +82,8 @@
                             id: 'A' + index,
                             tipo: 'articulo',
                             tipoLabel: 'Artículo',
-                            titulo: item.TITULO_PUBLICACION,
-                            autor: item.APELLIDOS_NOMBRES,
+                            titulo: (item.TITULO_PUBLICACION || '').trim(),
+                            autor: (item.APELLIDOS_NOMBRES || '').trim(),
                             revista: item.NOMBRE_REVISTA,
                             baseDatos: item.BASE_DATOS_INDEXADA,
                             fecha: item.FECHA_PUBLICACION,
@@ -93,8 +98,8 @@
             if (data.libros && data.libros.data) {
                 data.libros.data.forEach((item, index) => {
                     // Keys based on the curl output
-                    const titulo = item["AQUI SE ESCRIBE EL TEMA DE LA PUBLICACION TODO CON LETRA MAYUSCULA"];
-                    const autor = item["TODO CON MUYUSCULAS PRIMERO APELLIDOS Y LUEGO NOMBRES"];
+                    const titulo = (item["AQUI SE ESCRIBE EL TEMA DE LA PUBLICACION TODO CON LETRA MAYUSCULA"] || '').trim();
+                    const autor = (item["TODO CON MUYUSCULAS PRIMERO APELLIDOS Y LUEGO NOMBRES"] || '').trim();
                     
                     if (titulo && autor && titulo !== 'TITULO_LIBRO') {
                          newPublicaciones.push({
@@ -115,8 +120,8 @@
             // Process Capitulos (Chapters) - Long keys
             if (data.capitulos && data.capitulos.data) {
                 data.capitulos.data.forEach((item, index) => {
-                    const titulo = item["AQUI SE ESCRIBE EL TEMA DE LA PUBLICACION TODO CON LETRA MAYUSCULA"];
-                    const autor = item["TODO CON MUYUSCULAS PRIMERO APELLIDOS Y LUEGO NOMBRES"];
+                    const titulo = (item["AQUI SE ESCRIBE EL TEMA DE LA PUBLICACION TODO CON LETRA MAYUSCULA"] || '').trim();
+                    const autor = (item["TODO CON MUYUSCULAS PRIMERO APELLIDOS Y LUEGO NOMBRES"] || '').trim();
 
                     if (titulo && autor && titulo !== 'TITULO_CAPITULO') {
                         newPublicaciones.push({
@@ -133,8 +138,26 @@
                 });
             }
 
-            publicaciones = newPublicaciones;
-            calculateRankings();
+            // Calcular rankings con todos los registros para que cada autor reciba su crédito
+            calculateRankings(newPublicaciones);
+
+            // Deduplicar publicaciones para la lista y conteos
+            let titulosVistos = new Set();
+            let unicas = [];
+            for (let pub of newPublicaciones) {
+                let tituloNormalizado = (pub.titulo || '').toLowerCase().trim();
+                if (!titulosVistos.has(tituloNormalizado)) {
+                    titulosVistos.add(tituloNormalizado);
+                    unicas.push({ ...pub });
+                } else {
+                    let pubExistente = unicas.find(p => (p.titulo || '').toLowerCase().trim() === tituloNormalizado);
+                    if (pubExistente && pub.autor && !pubExistente.autor.includes(pub.autor)) {
+                        pubExistente.autor += ' / ' + pub.autor;
+                    }
+                }
+            }
+            publicaciones = unicas;
+            
             generateWordFreq();
             
             listaDocentes = topDocentes.map(d => d.nombre);
@@ -169,10 +192,10 @@
             .slice(0, 40);
     }
 
-    function calculateRankings() {
+    function calculateRankings(todasLasPubs) {
         const docentes = {};
         
-        publicaciones.forEach(pub => {
+        (todasLasPubs || publicaciones).forEach(pub => {
             const autor = pub.autor;
             if (!autor) return;
             
@@ -304,29 +327,57 @@
     const base = import.meta.env.BASE_URL;
 </script>
 
-<!-- Header -->
-<header class="bg-gradient-to-r from-[#003627] via-[#004d37] to-[#289543] text-white shadow-xl sticky top-0 z-40 border-b-4 border-[#C12927]">
-    <div class="container mx-auto px-4 py-3">
-        <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4 text-center lg:text-left">
-                <div class="bg-white p-1 rounded-sm shadow-sm">
-                    <img src="{base}carrera-educacion.png" alt="Logo Carrera Educación" class="h-12 lg:h-16 w-auto" />
+<!-- Header Fijo -->
+<header class="bg-gradient-to-r from-[#003627] via-[#004d37] to-[#289543] text-white shadow-xl fixed top-0 left-0 right-0 z-50 border-b-4 border-[#C12927]">
+    <div class="container mx-auto px-4 py-2">
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3 w-full lg:w-auto">
+                <div class="bg-white p-1 rounded-sm shadow-sm shrink-0">
+                    <img src="{base}carrera-educacion.png" alt="Logo Carrera Educación" class="h-10 lg:h-12 w-auto" />
                 </div>
-                <div>
-                    <h1 class="text-lg lg:text-2xl font-bold tracking-tight text-white drop-shadow-sm">
-                        Producción Científica 2026
+                <div class="hidden sm:block">
+                    <h1 class="text-sm lg:text-base font-bold tracking-tight text-white leading-tight">
+                        Producción 2026
                     </h1>
-                    <p class="text-green-100 text-xs lg:text-sm font-medium">Carrera Educación - UNESUM</p>
+                    <p class="text-green-100 text-[9px] lg:text-[10px] font-medium">UNESUM Educación</p>
+                </div>
+                
+                <!-- Buscador Integrado en Header -->
+                <div class="flex-1 max-w-md ml-2 lg:ml-6">
+                    <div class="relative group">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-green-800/70 group-focus-within:text-[#289543]"></i>
+                        <input type="text" bind:value={searchQuery}
+                               placeholder="Buscar por publicación o autor..."
+                               class="w-full pl-9 pr-3 py-1.5 bg-white/10 border border-white/20 rounded-full focus:bg-white focus:text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#C12927] text-sm placeholder:text-green-100/50 transition-all shadow-inner">
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center gap-6">
-                <div class="text-center">
-                    <div class="text-2xl lg:text-3xl font-bold">{totalPublicaciones}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-200">Publicaciones</div>
+
+            <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:gap-8 border-t lg:border-t-0 border-white/10 pt-2 lg:pt-0">
+                <div class="flex gap-4">
+                    <div class="text-center">
+                        <div class="text-lg lg:text-xl font-bold leading-none">{totalPublicaciones}</div>
+                        <div class="text-[9px] text-gray-200 uppercase tracking-wider">Publicaciones</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg lg:text-xl font-bold leading-none">{totalDocentes}</div>
+                        <div class="text-[9px] text-gray-200 uppercase tracking-wider">Docentes</div>
+                    </div>
                 </div>
-                <div class="text-center">
-                    <div class="text-2xl lg:text-3xl font-bold">{totalDocentes}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-200">Docentes</div>
+
+                <div class="flex gap-1">
+                    <button onclick={() => filterTipo = 'todos'} 
+                            class="px-2 py-1 rounded text-[10px] font-bold transition uppercase {filterTipo === 'todos' ? 'bg-white text-[#003627]' : 'bg-black/20 text-white hover:bg-black/30'}"
+                            title="Ver todos">Todos</button>
+                    <button onclick={() => toggleTipoFilter('articulo')} 
+                            class="p-1.5 rounded transition {filterTipo === 'articulo' ? 'bg-[#289543] text-white ring-1 ring-white' : 'bg-black/20 text-white hover:bg-black/30'}"
+                            title="Artículos"><i class="fas fa-newspaper text-xs"></i></button>
+                    <button onclick={() => toggleTipoFilter('libro')} 
+                            class="p-1.5 rounded transition {filterTipo === 'libro' ? 'bg-[#C12927] text-white ring-1 ring-white' : 'bg-black/20 text-white hover:bg-black/30'}"
+                            title="Libros"><i class="fas fa-book text-xs"></i></button>
+                    <button onclick={() => toggleTipoFilter('capitulo')} 
+                            class="p-1.5 rounded transition {filterTipo === 'capitulo' ? 'bg-[#003627] text-white ring-1 ring-white' : 'bg-black/20 text-white hover:bg-black/30'}"
+                            title="Capítulos"><i class="fas fa-bookmark text-xs"></i></button>
                 </div>
             </div>
         </div>
@@ -334,7 +385,7 @@
 </header>
 
 {#if loading}
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
         <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
             <div class="w-12 h-12 border-4 border-[#289543] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p class="text-[#5A5B5E]">Cargando...</p>
@@ -342,8 +393,32 @@
     </div>
 {/if}
 
-<main class="container mx-auto px-4 py-6">
-    <!-- Gráficos al principio -->
+<main class="container mx-auto px-4 pt-[130px] lg:pt-[84px] pb-8">
+    {#if selectedDocente || filterTipo !== 'todos' || searchQuery}
+        <div class="mb-6 flex flex-wrap items-center gap-2 bg-white p-3 rounded-lg shadow-sm border border-gray-100">
+            <span class="text-xs font-bold text-gray-400 uppercase mr-2">Filtros activos:</span>
+            
+            {#if selectedDocente}
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-[#003627] text-xs font-medium border border-green-200">
+                    <i class="fas fa-user mr-2"></i>{selectedDocente}
+                    <button onclick={() => selectedDocente = ''} class="ml-2 hover:text-red-600 transition" aria-label="Quitar docente"><i class="fas fa-times"></i></button>
+                </span>
+            {/if}
+
+            {#if filterTipo !== 'todos'}
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium border border-blue-200">
+                    <i class="fas fa-filter mr-2"></i>{filterTipo.charAt(0).toUpperCase() + filterTipo.slice(1)}s
+                    <button onclick={() => filterTipo = 'todos'} class="ml-2 hover:text-red-600 transition"><i class="fas fa-times"></i></button>
+                </span>
+            {/if}
+
+            <button onclick={clearFilters} class="text-xs text-red-600 font-bold hover:underline ml-auto">
+                <i class="fas fa-trash-alt mr-1"></i> LIMPIAR TODO
+            </button>
+        </div>
+    {/if}
+
+    <!-- Gráficos -->
     <section class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-xl shadow-md p-6">
             <h3 class="font-semibold text-[#003627] mb-4"><i class="fas fa-chart-pie text-[#289543] mr-2"></i>Distribución por Tipo</h3>
@@ -380,7 +455,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {#each topDocentes as docente, idx}
                 <div onclick={() => filterByDocente(docente.nombre)}
-                     class="bg-white rounded-xl p-4 shadow-md cursor-pointer border-2 transition-all hover:scale-[1.02] hover:shadow-lg {selectedDocente === docente.nombre ? 'border-[#289543] ring-2 ring-green-100' : 'border-transparent hover:border-gray-200'}"
+                     class="bg-white rounded-xl p-4 shadow-md cursor-pointer border-2 transition-all duration-300
+                     {selectedDocente === docente.nombre ? 'border-[#289543] ring-2 ring-green-100 scale-[1.03] z-10 shadow-lg' : (selectedDocente ? 'opacity-30 grayscale-[0.5] scale-[0.97]' : 'border-transparent hover:border-gray-200 hover:scale-[1.02] hover:shadow-lg')}"
                      role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && filterByDocente(docente.nombre)}>
                     
                     <div class="flex items-start gap-3">
@@ -419,66 +495,6 @@
                 </div>
             {/each}
         </div>
-    </section>
-
-    <!-- Filtros -->
-    <section class="bg-white rounded-xl shadow-md p-4 mb-6 sticky top-20 z-30 overflow-hidden">
-        <div class="flex flex-col md:flex-row items-center gap-4">
-            <div class="w-full md:flex-1 md:min-w-64 min-w-0">
-                <div class="relative w-full">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#5A5B5E]"></i>
-                    <input type="text" bind:value={searchQuery}
-                           placeholder="Buscar publicación..."
-                           class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-[#5A5B5E] text-sm truncate">
-                </div>
-            </div>
-            
-            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-center md:justify-start">
-                <button onclick={() => filterTipo = 'todos'} class="px-3 py-2 rounded-lg text-sm font-medium transition flex-grow md:flex-grow-0 text-center
-                        {filterTipo === 'todos' ? 'bg-[#003627] text-white' : 'bg-gray-100 text-[#5A5B5E] hover:bg-gray-200'}">
-                    Todos
-                </button>
-                <button onclick={() => toggleTipoFilter('articulo')} class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 flex-grow md:flex-grow-0
-                        {filterTipo === 'articulo' ? 'bg-[#289543] text-white' : 'bg-green-50 text-[#289543] hover:bg-green-100'}">
-                    <i class="fas fa-newspaper"></i> Artículos <span class="bg-white/20 px-1.5 rounded">{conteoArticulos}</span>
-                </button>
-                <button onclick={() => toggleTipoFilter('libro')} class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 flex-grow md:flex-grow-0
-                        {filterTipo === 'libro' ? 'bg-[#C12927] text-white' : 'bg-red-50 text-[#C12927] hover:bg-red-100'}">
-                    <i class="fas fa-book"></i> Libros <span class="bg-white/20 px-1.5 rounded">{conteoLibros}</span>
-                </button>
-                <button onclick={() => toggleTipoFilter('capitulo')} class="px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 flex-grow md:flex-grow-0
-                        {filterTipo === 'capitulo' ? 'bg-[#003627] text-white' : 'bg-gray-200 text-[#003627] hover:bg-gray-300'}">
-                    <i class="fas fa-bookmark"></i> Capítulos <span class="bg-white/20 px-1.5 rounded">{conteoCapitulos}</span>
-                </button>
-            </div>
-            
-            <select bind:value={selectedDocente}
-                    class="w-full md:w-auto px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#289543] text-sm text-[#5A5B5E]">
-                <option value="">Todos los docentes</option>
-                {#each listaDocentes as docente}
-                    <option value={docente}>{docente}</option>
-                {/each}
-            </select>
-            
-            {#if hasActiveFilters}
-                <button onclick={clearFilters}
-                        class="w-full md:w-auto px-4 py-2 text-[#C12927] hover:bg-red-50 rounded-lg text-sm font-medium text-center">
-                    <i class="fas fa-times mr-1"></i> Limpiar
-                </button>
-            {/if}
-        </div>
-        
-        {#if selectedDocente}
-            <div class="mt-3 flex items-center gap-2">
-                <span class="text-sm text-[#5A5B5E]">Filtrando:</span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-[#003627] text-sm">
-                    <i class="fas fa-user mr-2"></i>{selectedDocente}
-                    <button onclick={() => selectedDocente = ''} class="ml-2 hover:text-[#C12927]" aria-label="Quitar filtro de docente"><i class="fas fa-times"></i></button>
-                </span>
-            </div>
-        {/if}
-    </section>
-
     <!-- Resultados -->
     <section>
         <div class="flex items-center justify-between mb-4">
