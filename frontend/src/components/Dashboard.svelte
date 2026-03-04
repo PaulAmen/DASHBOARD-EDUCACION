@@ -356,7 +356,7 @@
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-green-800/70 group-focus-within:text-[#289543]"></i>
                         <input type="text" bind:value={searchQuery}
                                placeholder="Buscar por publicación o autor..."
-                               class="w-full pl-9 pr-3 py-1.5 bg-white/10 border border-white/20 rounded-full focus:bg-white focus:text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#C12927] text-sm placeholder:text-green-100/50 transition-all shadow-inner">
+                               class="w-full pl-9 pr-3 py-1.5 bg-white/10 border border-white/20 rounded-full focus:bg-white focus:text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#C12927] text-base placeholder:text-green-100/50 transition-all shadow-inner">
                     </div>
                 </div>
             </div>
