@@ -8,67 +8,97 @@
 // ============================================
 const SPREADSHEET_ID = '1Juf-kboGLYMiuuJsipB6s2cKXFinx5kcv2_tKJtev_o'; // ID de la hoja de producción UNESUM
 
-// Campos que necesita el dashboard (solo estos se envían)
+// Campos que necesita el dashboard (soporta nombres nuevos de la hoja de producción y compatibilidad anterior)
 const CAMPOS = {
   REVISTAS: {
-    headerRow: 2,
+    headerRow: 1,
     campos: {
-      titulo: 'TITULO_PUBLICACION',
-      autor: 'APELLIDOS_NOMBRES',
-      identificacion: 'IDENTIFICACION_PARTICIPANTE',
-      carrera: 'CARRERA',
-      facultad: 'FACULTAD',
-      relacionLaboral: 'RELACION_LABORAL',
-      gradoAcademico: 'GRADO ACADEMICO',
-      revista: 'NOMBRE_REVISTA',
-      baseDatos: 'BASE_DATOS_INDEXADA',
-      tipoBaseDatos: 'TIPO_BASE_DATOS_INDEXADA',
-      issn: 'CODIGO_ISSN',
-      fecha: 'FECHA_PUBLICACION',
-      link: 'LINK_PUBLICACION',
-      proyecto: 'TITULO_PROYECTO',
-      cuartil: 'CUARTIL',
-      sjr: 'SJR',
-      posicion: 'POSICION',
-      periodoAcademico: 'PERIODO_ACADEMICO',
-      interculturalidad: 'INTERCULTURALIDAD (SI o NO)',
-      numeroRevista: 'NUMERO_REVISTA',
-      estadoProyecto: 'ESTADO_PROYECTO',
-      pdfAval: 'PDF_AVAL_CARTA_CERTIFICADO-PUBLICACION'
+      titulo: ['TITULO_PUBLICACION', 'TITULO_ARTICULO', 'TITULO'],
+      autor: ['APELLIDOS_NOMBRES', 'AUTOR', 'AUTORES'],
+      identificacion: ['IDENTIFICACION_PARTICIPANTE', 'CEDULA', 'IDENTIFICACION'],
+      carrera: ['CARRERA'],
+      facultad: ['FACULTAD'],
+      relacionLaboral: ['RELACION_LABORAL'],
+      gradoAcademico: ['GRADO ACADEMICO', 'GRADO_ACADEMICO'],
+      revista: ['NOMBRE_REVISTA', 'REVISTA'],
+      baseDatos: ['BASE_DATOS_INDEXADA', 'BASE_DATOS'],
+      tipoBaseDatos: ['TIPO_BASE_DATOS_INDEXADA'],
+      issn: ['CODIGO_ISSN', 'ISSN'],
+      fecha: ['FECHA_PUBLICACION', 'FECHA'],
+      link: ['LINK_PUBLICACION', 'LINK_REVISTA', 'LINK'],
+      doi: ['CODIGO_PUBLICACION', 'cOdigo doi', 'DOI'],
+      proyecto: ['TITULO_PROYECTO_INVESTIGACION', 'TITULO_PROYECTO_VINCULACION', 'TITULO_PROYECTO'],
+      estadoProyecto: ['ESTADO_PROYECTO_INVESTIGACION', 'ESTADO_PROYECTO_VINCULACION', 'ESTADO_PROYECTO'],
+      cuartil: ['CUARTIL'],
+      sjr: ['SJR'],
+      posicion: ['POSICION'],
+      periodoAcademico: ['PERIODO_ACADEMICO', 'PERIODO ACADEMICO'],
+      interculturalidad: ['INTERCULTURALIDAD (SI o NO)', 'INTERCULTURALIDAD'],
+      numeroRevista: ['NUMERO_REVISTA'],
+      pdfAval: ['PDF_AVAL_CARTA_CERTIFICADO-PUBLICACION', 'LINK DE EVIDENCIAS (GOOGLE DRIVE COMPARTIDO)'],
+      campoDetallado: ['CAMPO_DETALLADO'],
+      lineaInvestigacion: ['LINEA_INVESTIGACION'],
+      filiacion: ['FILIACION'],
+      participacion: ['PARTICIPACION'],
+      estadoArticulo: ['ESTADO'],
+      estadoRegistro: ['ESTADO_REGISTRO'],
+      idRecord: ['ID']
     }
   },
   LIBROS: {
-    headerRow: 2,
+    headerRow: 1,
     campos: {
-      titulo: 'TITULO_LIBRO',
-      autor: 'APELLIDOS_NOMBRES',
-      identificacion: 'IDENTIFICACION_PARTICIPANTE',
-      carrera: 'CARRERA',
-      facultad: 'FACULTAD',
-      relacionLaboral: 'RELACION_LABORAL',
-      gradoAcademico: 'GRADO ACADEMICO',
-      isbn: 'CODIGO_ISBN',
-      fecha: 'FECHA_PUBLICACION',
-      link: 'ENLACE_LIBRO',
-      proyecto: 'TITULO_PROYECTO',
-      periodoAcademico: 'PERIODO_ACADEMICO'
+      titulo: ['TITULO_LIBRO', 'TITULO'],
+      autor: ['APELLIDOS_NOMBRES', 'AUTOR', 'AUTORES'],
+      identificacion: ['IDENTIFICACION_PARTICIPANTE', 'CEDULA', 'IDENTIFICACION'],
+      carrera: ['CARRERA'],
+      facultad: ['FACULTAD'],
+      relacionLaboral: ['RELACION_LABORAL'],
+      gradoAcademico: ['GRADO ACADEMICO', 'GRADO_ACADEMICO'],
+      isbn: ['CODIGO_ISBN', 'ISBN'],
+      fecha: ['FECHA_PUBLICACION', 'FECHA'],
+      link: ['ENLACE_LIBRO', 'LINK_PUBLICACION', 'LINK'],
+      proyecto: ['TITULO_PROYECTO_INVESTIGACION', 'TITULO_PROYECTO_VINCULACION', 'TITULO_PROYECTO'],
+      estadoProyecto: ['ESTADO_PROYECTO_INVESTIGACION', 'ESTADO_PROYECTO_VINCULACION', 'ESTADO_PROYECTO'],
+      periodoAcademico: ['PERIODO_ACADEMICO', 'PERIODO ACADEMICO'],
+      posicion: ['POSICION'],
+      revisadoPares: ['REVISADO_PARES'],
+      campoDetallado: ['CAMPO_DETALLADO'],
+      lineaInvestigacion: ['LINEA_INVESTIGACION'],
+      pdfAval: ['PDF_AVAL_CARTA_CERTIFICADO-PUBLICACION'],
+      filiacion: ['FILIACION'],
+      participacion: ['PARTICIPACION'],
+      estadoRegistro: ['ESTADO_REGISTRO'],
+      idRecord: ['ID']
     }
   },
   CAPITULOS: {
-    headerRow: 2,
+    headerRow: 1,
     campos: {
-      titulo: 'TITULO_CAPITULO',
-      libroPadre: 'TITULO_LIBRO',
-      autor: 'APELLIDOS_NOMBRES',
-      identificacion: 'IDENTIFICACION_PARTICIPANTE',
-      carrera: 'CARRERA',
-      facultad: 'FACULTAD',
-      relacionLaboral: 'RELACION_LABORAL',
-      gradoAcademico: 'GRADO ACADEMICO',
-      isbn: 'CODIGO_ISBN',
-      fecha: 'FECHA_PUBLICACION',
-      paginas: 'PAGINAS (DESDE_23-45)',
-      periodoAcademico: 'PERIODO_ACADEMICO'
+      titulo: ['TITULO_CAPITULO', 'TITULO'],
+      libroPadre: ['TITULO_LIBRO', 'LIBRO'],
+      autor: ['APELLIDOS_NOMBRES', 'AUTOR', 'AUTORES'],
+      identificacion: ['IDENTIFICACION_PARTICIPANTE', 'CEDULA', 'IDENTIFICACION'],
+      carrera: ['CARRERA'],
+      facultad: ['FACULTAD'],
+      relacionLaboral: ['RELACION_LABORAL'],
+      gradoAcademico: ['GRADO ACADEMICO', 'GRADO_ACADEMICO'],
+      isbn: ['CODIGO_ISBN', 'ISBN'],
+      fecha: ['FECHA_PUBLICACION', 'FECHA'],
+      paginas: ['PAGINAS (DESDE_23-45)', 'PAGINAS'],
+      link: ['LINK DEL CAPITULO DE LIBRO', 'ENLACE_LIBRO', 'LINK_PUBLICACION', 'LINK'],
+      editor: ['EDITOR_COMPILADOR', 'EDITOR'],
+      proyecto: ['TITULO_PROYECTO_INVESTIGACION', 'TITULO_PROYECTO_VINCULACION', 'TITULO_PROYECTO'],
+      estadoProyecto: ['ESTADO_PROYECTO_INVESTIGACION', 'ESTADO_PROYECTO_VINCULACION', 'ESTADO_PROYECTO'],
+      periodoAcademico: ['PERIODO_ACADEMICO', 'PERIODO ACADEMICO'],
+      posicion: ['POSICION'],
+      campoDetallado: ['CAMPO_DETALLADO'],
+      lineaInvestigacion: ['LINEA_INVESTIGACION'],
+      pdfAval: ['PDF_AVAL_CARTA_CERTIFICADO-PUBLICACION'],
+      filiacion: ['FILIACION'],
+      participacion: ['PARTICIPACION'],
+      estadoRegistro: ['ESTADO_REGISTRO'],
+      idRecord: ['ID']
     }
   }
 };
@@ -250,15 +280,15 @@ function normalizarHeader(value) {
 }
 
 /**
- * Detecta la fila de encabezados buscando la que contenga el header `titulo` configurado.
+ * Detecta la fila de encabezados buscando la que contenga cualquiera de los encabezados `titulo` configurados.
  * Recorre las primeras 5 filas. Devuelve el índice 0-based, o null si no se encuentra.
  */
-function detectarHeaderRow(data, tituloHeader) {
-  const objetivo = normalizarHeader(tituloHeader);
+function detectarHeaderRow(data, tituloConfig) {
+  const objetivos = (Array.isArray(tituloConfig) ? tituloConfig : [tituloConfig]).map(normalizarHeader);
   const limite = Math.min(data.length, 5);
   for (let i = 0; i < limite; i++) {
     const fila = data[i] || [];
-    if (fila.some(c => normalizarHeader(c) === objetivo)) return i;
+    if (fila.some(c => objetivos.includes(normalizarHeader(c)))) return i;
   }
   return null;
 }
@@ -286,37 +316,53 @@ function getHojaOptimizada(ss, nombreHoja) {
   const headers = (data[headerIdx] || []).map(normalizarHeader);
   const rows = data.slice(headerIdx + 1);
 
-  // Crear mapa de índices para los campos que necesitamos (comparación normalizada)
-  // Columnas que pueden faltar en libros/capítulos porque se enriquecen via REVISTAS
+  // Crear mapa de índices para los campos que necesitamos (soporta múltiples candidatos por campo)
   const OPCIONALES_ENRIQUECIBLES = new Set(['relacionLaboral', 'gradoAcademico', 'facultad']);
 
   const indices = {};
   const faltantesCriticos = [];
-  for (const [key, headerName] of Object.entries(config.campos)) {
-    const objetivo = normalizarHeader(headerName);
-    const idx = headers.indexOf(objetivo);
-    indices[key] = idx;
-    if (idx < 0 && !OPCIONALES_ENRIQUECIBLES.has(key)) {
-      faltantesCriticos.push(headerName);
+  for (const [key, candidateHeaders] of Object.entries(config.campos)) {
+    const list = Array.isArray(candidateHeaders) ? candidateHeaders : [candidateHeaders];
+    let foundIdx = -1;
+    for (const h of list) {
+      const objetivo = normalizarHeader(h);
+      const idx = headers.indexOf(objetivo);
+      if (idx >= 0) {
+        foundIdx = idx;
+        break;
+      }
+    }
+    indices[key] = foundIdx;
+    if (foundIdx < 0 && !OPCIONALES_ENRIQUECIBLES.has(key) && ['titulo', 'autor'].includes(key)) {
+      faltantesCriticos.push(list.join(' / '));
     }
   }
+
   if (faltantesCriticos.length) {
-    Logger.log('[' + nombreHoja + '] Columnas no encontradas: ' + faltantesCriticos.join(' | '));
+    Logger.log('[' + nombreHoja + '] Columnas críticas no encontradas: ' + faltantesCriticos.join(' | '));
   }
   if (indices.titulo < 0 || indices.autor < 0) {
-    Logger.log('[' + nombreHoja + '] No se pudieron localizar titulo/autor. Encabezados leidos: ' + headers.join(' | '));
+    Logger.log('[' + nombreHoja + '] No se pudieron localizar titulo/autor. Encabezados leídos: ' + headers.join(' | '));
     return [];
   }
   
   // Extraer solo los campos necesarios
   const registros = [];
   rows.forEach((row, idx) => {
-    // Verificar que la fila tenga datos
+    // Si la fila tiene estado de registro y es BORRADOR, se omite del dashboard público
+    if (indices.estadoRegistro >= 0) {
+      const estadoReg = String(row[indices.estadoRegistro] || '').trim().toUpperCase();
+      if (estadoReg === 'BORRADOR') return;
+    }
+
+    // Verificar que la fila tenga datos esenciales
     const tieneAutor = indices.autor >= 0 && row[indices.autor];
     const tieneTitulo = indices.titulo >= 0 && row[indices.titulo];
     
     if (tieneAutor && tieneTitulo) {
-      const registro = { id: nombreHoja + '_' + idx };
+      const idReal = indices.idRecord >= 0 && row[indices.idRecord] ? String(row[indices.idRecord]).trim() : '';
+      const registro = { id: idReal || (nombreHoja + '_' + idx) };
+      if (idReal) registro.recordId = idReal;
       
       for (const [key, colIdx] of Object.entries(indices)) {
         if (colIdx >= 0) {
@@ -330,6 +376,17 @@ function getHojaOptimizada(ss, nombreHoja) {
             registro[key] = valor;
           }
         }
+      }
+
+      // Si no hay proyecto unificado pero sí columnas de investigación/vinculación
+      if (!registro.proyecto) {
+        const idxInv = headers.indexOf(normalizarHeader('TITULO_PROYECTO_INVESTIGACION'));
+        const idxVin = headers.indexOf(normalizarHeader('TITULO_PROYECTO_VINCULACION'));
+        const valInv = idxInv >= 0 ? String(row[idxInv] || '').trim() : '';
+        const valVin = idxVin >= 0 ? String(row[idxVin] || '').trim() : '';
+        if (valInv && valVin) registro.proyecto = valInv + ' / ' + valVin;
+        else if (valInv) registro.proyecto = valInv;
+        else if (valVin) registro.proyecto = valVin;
       }
       
       registros.push(registro);
@@ -516,14 +573,17 @@ function debugRevistas() {
   Logger.log('Encabezados normalizados: ' + headers.join(' | '));
 
   const faltantes = [];
-  for (const [key, headerName] of Object.entries(config.campos)) {
-    const idx = headers.indexOf(normalizarHeader(headerName));
-    if (idx < 0) faltantes.push(key + '=' + headerName);
+  for (const [key, candidateHeaders] of Object.entries(config.campos)) {
+    const list = Array.isArray(candidateHeaders) ? candidateHeaders : [candidateHeaders];
+    const found = list.some(h => headers.indexOf(normalizarHeader(h)) >= 0);
+    if (!found) faltantes.push(key + '=' + list.join('/'));
   }
   Logger.log('Columnas configuradas que NO se encontraron: ' + (faltantes.length ? faltantes.join(' , ') : 'ninguna'));
 
-  const idxTitulo = headers.indexOf(normalizarHeader(config.campos.titulo));
-  const idxAutor = headers.indexOf(normalizarHeader(config.campos.autor));
+  const tituloList = (Array.isArray(config.campos.titulo) ? config.campos.titulo : [config.campos.titulo]).map(normalizarHeader);
+  const autorList = (Array.isArray(config.campos.autor) ? config.campos.autor : [config.campos.autor]).map(normalizarHeader);
+  const idxTitulo = headers.findIndex(h => tituloList.includes(h));
+  const idxAutor = headers.findIndex(h => autorList.includes(h));
   let conTituloYAutor = 0;
   data.slice(headerIdx + 1).forEach(row => {
     if (idxTitulo >= 0 && idxAutor >= 0 && row[idxTitulo] && row[idxAutor]) conTituloYAutor++;
