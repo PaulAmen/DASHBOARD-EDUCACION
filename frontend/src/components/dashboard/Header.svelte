@@ -1,6 +1,7 @@
 <!-- Header.svelte -->
 <script>
     import { filters, clearTipoFilters, toggleCuartil, toggleTipo } from '../../stores/filters.svelte.js';
+    import { dataStore, refreshData } from '../../data/store.svelte.js';
     import ActiveFilters from './ActiveFilters.svelte';
 
     let {
@@ -56,8 +57,8 @@
                 </div>
             </div>
 
-            <!-- Metrics -->
-            <div class="flex gap-4 sm:gap-6 justify-center sm:justify-end w-full sm:w-auto order-2 sm:order-none">
+            <!-- Metrics & Sincronización -->
+            <div class="flex items-center gap-3 sm:gap-5 justify-center sm:justify-end w-full sm:w-auto order-2 sm:order-none">
                 <div class="text-center">
                     <div class="text-lg lg:text-xl font-bold leading-none">{totalPublicaciones}</div>
                     <div class="text-[9px] text-gray-200 uppercase tracking-wider">Publicaciones</div>
@@ -66,6 +67,15 @@
                     <div class="text-lg lg:text-xl font-bold leading-none">{totalDocentes}</div>
                     <div class="text-[9px] text-gray-200 uppercase tracking-wider">Docentes</div>
                 </div>
+                <button
+                    onclick={() => refreshData()}
+                    disabled={dataStore.loading}
+                    class="p-2 rounded-full hover:bg-white/15 text-white/80 hover:text-white transition-colors focus-ring disabled:opacity-50"
+                    title="Actualizar datos desde la hoja de cálculo"
+                    aria-label="Actualizar datos desde la hoja de cálculo"
+                >
+                    <i class="fas fa-sync-alt text-sm {dataStore.loading ? 'fa-spin text-[#289543]' : ''}"></i>
+                </button>
             </div>
         </div>
     </div>

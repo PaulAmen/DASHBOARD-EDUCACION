@@ -11,11 +11,11 @@ export const dataStore = $state({
     topDocentes: []
 });
 
-export async function loadData() {
+export async function loadData(refresh = false) {
     dataStore.loading = true;
     dataStore.error = null;
     try {
-        const payload = await fetchDashboard();
+        const payload = await fetchDashboard(refresh);
         const vm = toViewModel(payload);
         dataStore.publicacionesRaw = vm.publicacionesRaw;
         dataStore.publicaciones = vm.publicaciones;
@@ -30,4 +30,8 @@ export async function loadData() {
     } finally {
         dataStore.loading = false;
     }
+}
+
+export async function refreshData() {
+    return loadData(true);
 }

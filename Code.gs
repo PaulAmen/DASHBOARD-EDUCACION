@@ -106,7 +106,7 @@ const CAMPOS = {
 // ============================================
 // CACHE
 // ============================================
-const CACHE_TTL_SECONDS = 21600;       // 6 horas (máximo de CacheService)
+const CACHE_TTL_SECONDS = 300;         // 5 minutos (evita datos estancados si hay inserciones externas)
 const CACHE_CHUNK_SIZE = 95 * 1024;    // 95KB por chunk (límite de CacheService = 100KB)
 const CACHE_KEY_META = 'dashboard:meta';
 const CACHE_KEY_CHUNK = 'dashboard:chunk:';
@@ -596,12 +596,35 @@ function debugRevistas() {
 // ============================================
 
 /**
- * Registra el activador automático en tiempo real.
- * Cada vez que alguien edite la hoja de producción, este activador
- * llamará a warmCache() para regenerar la caché al instante.
+ * CONFIGURACIÓN RECOMENDADA (Ejecutar esta función una vez):
+ * Combina dos mecanismos para que NUNCA tengas que editar la hoja manualmente:
+ * 1. Activador onChange: Detecta al instante cualquier edición manual en la hoja.
+ * 2. Activador por tiempo cada 5 minutos: Detecta automáticamente cualquier artículo
+ *    o libro insertado por sistemas externos (como el backend de producción o formularios),
+ *    los cuales Google Sheets NO notifica a través de onChange por diseño de seguridad.
+ */
+function activarSincronizacionAutomatica() {
+  eliminarTriggers();
+
+  // 1. Detectar cambios manuales en la hoja
+  ScriptApp.newTrigger('warmCache')
+    .forSpreadsheet(SpreadsheetApp.openById(SPREADSHEET_ID))
+    .onChange()
+    .create();
+
+  // 2. Revisión automática periódica cada 5 minutos para capturar lo que agregue el sistema de producción
+  ScriptApp.newTrigger('warmCache')
+    .timeBased()
+    .everyMinutes(5)
+    .create();
+
+  Logger.log('✅ Sincronización automática configurada con éxito (onChange + cada 5 minutos)');
+}
+
+/**
+ * Registra únicamente el activador onChange.
  */
 function activarOnChange() {
-  // Eliminar activadores previos para no duplicar
   eliminarTriggers();
 
   ScriptApp.newTrigger('warmCache')
@@ -613,7 +636,7 @@ function activarOnChange() {
 }
 
 /**
- * Elimina los activadores asociados a este script.
+ * Elimina todos los activadores asociados a este script.
  */
 function eliminarTriggers() {
   const triggers = ScriptApp.getProjectTriggers();
