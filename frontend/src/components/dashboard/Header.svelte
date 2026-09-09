@@ -40,7 +40,7 @@
                 </div>
                 <div>
                     <h1 class="text-sm lg:text-base font-bold tracking-tight text-white leading-none">
-                        Producción 2025
+                        Producción Científica
                     </h1>
                     <p class="text-green-100 text-[10px] font-medium mt-0.5">UNESUM</p>
                 </div>
