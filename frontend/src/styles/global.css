@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+@layer components {
+  .dashboard-card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden;
+  }
+  .dashboard-section-title {
+    @apply text-xl font-bold text-gray-800 mb-4;
+  }
+  .dashboard-muted {
+    @apply text-gray-500 text-sm;
+  }
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#289543] focus-visible:ring-offset-1;
+  }
+
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
