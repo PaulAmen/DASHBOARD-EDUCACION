@@ -5,6 +5,8 @@
     import { isSamePerson } from '../../lib/publicaciones/strings.js';
     import { calcularRanking } from '../../lib/ranking.js';
 
+    let mapaRankGlobal = $derived(new Map(dataStore.topDocentes.map(d => [d.clave, d.rank])));
+
     let publicacionesRanking = $derived(filtrarPublicaciones(dataStore.publicacionesRaw, {
         tipo: filters.tipo,
         cuartil: filters.cuartil,
@@ -12,8 +14,14 @@
         revista: filters.revista,
         query: filters.query
     }));
-    let topDocentes = $derived(calcularRanking(publicacionesRanking));
-    let top3Global = $derived(dataStore.topDocentes.slice(0, 3).map(d => d.nombre));
+
+    let topDocentes = $derived.by(() => {
+        const ranking = calcularRanking(publicacionesRanking);
+        return ranking.map(d => ({
+            ...d,
+            globalRank: mapaRankGlobal.get(d.clave) || d.rank
+        })).sort((a, b) => a.globalRank - b.globalRank);
+    });
 
     let filtroTitular = $state('todos'); // 'todos', 'titulares', 'no_titulares'
     let filtroPhD = $state('todos');     // 'todos', 'phd', 'no_phd'
@@ -31,7 +39,6 @@
         if (filtroTitular === 'no_titulares' && d.isTitular) return false;
         if (filtroPhD === 'phd' && !d.isPhD) return false;
         if (filtroPhD === 'no_phd' && d.isPhD) return false;
-        if ((filters.docente || filters.docenteId) && !isDocenteSelected(d)) return false;
         return true;
     }));
 
@@ -44,9 +51,13 @@
         return filters.cuartil.reduce((sum, q) => sum + (docente[q] || 0), 0);
     }
 
-    function medallaGlobal(nombre) {
-        const idx = top3Global.indexOf(nombre);
-        return idx >= 0 ? idx + 1 : 0;
+    function medallaGlobal(docente) {
+        const rank = docente.globalRank || mapaRankGlobal.get(docente.clave) || docente.rank;
+        return rank <= 3 ? rank : 0;
+    }
+
+    function posicionDocente(docente) {
+        return docente.globalRank || mapaRankGlobal.get(docente.clave) || docente.rank;
     }
 </script>
 
@@ -85,11 +96,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {#each docentesMostrados as docente (docente.clave)}
-            {@const medalla = medallaGlobal(docente.nombre)}
+            {@const medalla = medallaGlobal(docente)}
             {@const isSelected = isDocenteSelected(docente)}
             <div onclick={() => filterByDocente(docente)}
-                 class="dashboard-card p-4 cursor-pointer border-2 transition-colors duration-200 focus-ring
-                 {isSelected ? 'border-[#289543] bg-green-50 shadow-md' : 'border-transparent hover:border-gray-200 hover:bg-gray-50'}"
+                 class="dashboard-card p-4 cursor-pointer border-2 transition-all duration-200 focus-ring
+                 {isSelected ? 'border-[#289543] bg-green-50 shadow-md ring-2 ring-[#289543]/20' : 'border-transparent hover:border-gray-200 hover:bg-gray-50'}"
                  role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && filterByDocente(docente)}
                  aria-label={`Filtrar por ${docente.nombre}`} aria-pressed={isSelected}>
 
@@ -103,7 +114,7 @@
                         {:else if medalla === 3}
                             <i class="fas fa-medal text-[#d97706]"></i>
                         {:else}
-                            <span class="text-[#5A5B5E] text-base">{docente.rank}</span>
+                            <span class="text-[#5A5B5E] text-base">{posicionDocente(docente)}</span>
                         {/if}
                     </div>
 

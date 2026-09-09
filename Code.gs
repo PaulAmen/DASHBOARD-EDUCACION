@@ -124,6 +124,10 @@ function getDashboardJsonCached(forceRefresh) {
     if (metaRaw) {
       try {
         const meta = JSON.parse(metaRaw);
+        // Verificación estricta: si la caché tiene más de CACHE_TTL_SECONDS, expira de inmediato
+        if (meta.ts && (Date.now() - meta.ts > CACHE_TTL_SECONDS * 1000)) {
+          throw new Error('Caché expirada por tiempo (' + Math.round((Date.now() - meta.ts) / 1000) + 's)');
+        }
         const claves = [];
         for (let i = 0; i < meta.chunks; i++) claves.push(CACHE_KEY_CHUNK + i);
         const partes = cache.getAll(claves);
