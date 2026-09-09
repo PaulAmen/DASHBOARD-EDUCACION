@@ -3,6 +3,7 @@ export const filters = $state({
     cuartil: [],     // array para multiselección
     carrera: '',
     docente: '',
+    docenteId: '',
     revista: '',
     query: ''
 });
@@ -12,8 +13,14 @@ export function clearFilters() {
     filters.cuartil = [];
     filters.carrera = '';
     filters.docente = '';
+    filters.docenteId = '';
     filters.revista = '';
     filters.query = '';
+}
+
+export function clearDocente() {
+    filters.docente = '';
+    filters.docenteId = '';
 }
 
 export function clearTipoFilters() {
@@ -21,8 +28,15 @@ export function clearTipoFilters() {
     filters.cuartil = [];
 }
 
-export function selectDocente(nombre) {
-    filters.docente = filters.docente === nombre ? '' : nombre;
+export function selectDocente(nombre, identificacion = '') {
+    const cleanId = String(identificacion || '').trim();
+    if (filters.docente === nombre || (cleanId && filters.docenteId === cleanId)) {
+        filters.docente = '';
+        filters.docenteId = '';
+    } else {
+        filters.docente = nombre;
+        filters.docenteId = cleanId;
+    }
 }
 
 export function toggleTipo(tipo) {
@@ -62,6 +76,7 @@ export function isActive() {
         filters.cuartil.length > 0 ||
         !!filters.carrera ||
         !!filters.docente ||
+        !!filters.docenteId ||
         !!filters.revista ||
         !!filters.query
     );

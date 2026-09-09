@@ -27,7 +27,9 @@ export {
 export {
     splitMultiValue,
     normalizeTextKey,
-    normalizeJournalKey
+    normalizeJournalKey,
+    normalizePersonName,
+    isSamePerson
 } from './publicaciones/strings.js';
 
 export {
@@ -37,5 +39,6 @@ export {
 
 export {
     filtrarPublicaciones,
-    includesMultiValueFlex
+    includesMultiValueFlex,
+    matchesAuthor
 } from './publicaciones/filtrar.js';

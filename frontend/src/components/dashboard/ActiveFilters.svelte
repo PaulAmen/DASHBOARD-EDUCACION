@@ -1,6 +1,6 @@
 <!-- ActiveFilters.svelte -->
 <script>
-    import { filters, clearFilters } from '../../stores/filters.svelte.js';
+    import { filters, clearFilters, clearDocente } from '../../stores/filters.svelte.js';
 
     let { onClearAll = clearFilters, inHeader = false } = $props();
 
@@ -13,7 +13,7 @@
     }
 </script>
 
-{#if filters.docente || filters.tipo.length > 0 || filters.cuartil.length > 0 || filters.carrera || filters.revista || filters.query}
+{#if filters.docente || filters.docenteId || filters.tipo.length > 0 || filters.cuartil.length > 0 || filters.carrera || filters.revista || filters.query}
     <div class="{inHeader ? 'border-t border-white/10 bg-white/95 px-4 py-2 shadow-inner' : 'mb-6 bg-white p-3 rounded-lg shadow-sm border border-gray-100'}">
         <div class="container mx-auto flex flex-wrap items-center gap-2 {inHeader ? '' : '!px-0'}">
         <span class="text-xs font-bold text-gray-400 uppercase mr-2">Filtros activos:</span>
@@ -28,7 +28,7 @@
         {#if filters.docente}
             <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-[#003627] text-xs font-medium border border-green-200">
                 <i class="fas fa-user mr-2"></i>{filters.docente}
-                <button onclick={() => filters.docente = ''} class="ml-2 hover:text-red-600 transition" aria-label="Quitar docente"><i class="fas fa-times"></i></button>
+                <button onclick={clearDocente} class="ml-2 hover:text-red-600 transition" aria-label="Quitar docente"><i class="fas fa-times"></i></button>
             </span>
         {/if}
 

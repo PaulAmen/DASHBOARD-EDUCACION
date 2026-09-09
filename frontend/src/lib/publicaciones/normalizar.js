@@ -79,9 +79,11 @@ export function deduplicarPorTitulo(publicaciones) {
             if (pubExistente) {
                 const autorUnificado = mergeMultiValue(pubExistente.autor, pub.autor);
                 const carreraUnificada = normalizarCampoCarrera(mergeMultiValue(pubExistente.carrera, pub.carrera));
+                const identificacionUnificada = mergeMultiValue(pubExistente.identificacion, pub.identificacion);
 
                 if (autorUnificado) pubExistente.autor = autorUnificado;
                 if (carreraUnificada) pubExistente.carrera = carreraUnificada;
+                if (identificacionUnificada) pubExistente.identificacion = identificacionUnificada;
             }
         }
     }

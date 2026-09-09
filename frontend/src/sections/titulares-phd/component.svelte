@@ -9,6 +9,7 @@
         cuartil: filters.cuartil,
         carrera: filters.carrera,
         docente: filters.docente,
+        docenteId: filters.docenteId,
         revista: filters.revista,
         query: filters.query
     }));

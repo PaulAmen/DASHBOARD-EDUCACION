@@ -590,3 +590,33 @@ function debugRevistas() {
   });
   Logger.log('Filas con TITULO_PUBLICACION + APELLIDOS_NOMBRES llenos: ' + conTituloYAutor);
 }
+
+// ============================================
+// ACTIVADORES AUTOMÁTICOS
+// ============================================
+
+/**
+ * Registra el activador automático en tiempo real.
+ * Cada vez que alguien edite la hoja de producción, este activador
+ * llamará a warmCache() para regenerar la caché al instante.
+ */
+function activarOnChange() {
+  // Eliminar activadores previos para no duplicar
+  eliminarTriggers();
+
+  ScriptApp.newTrigger('warmCache')
+    .forSpreadsheet(SpreadsheetApp.openById(SPREADSHEET_ID))
+    .onChange()
+    .create();
+
+  Logger.log('✅ Activador onChange configurado con éxito para la hoja: ' + SPREADSHEET_ID);
+}
+
+/**
+ * Elimina los activadores asociados a este script.
+ */
+function eliminarTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(t => ScriptApp.deleteTrigger(t));
+  Logger.log('Activadores eliminados: ' + triggers.length);
+}

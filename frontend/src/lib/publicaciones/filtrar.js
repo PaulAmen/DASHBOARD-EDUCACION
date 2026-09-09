@@ -1,11 +1,24 @@
 // frontend/src/lib/publicaciones/filtrar.js
 import { getCuartil } from '../caces/index.js';
-import { splitMultiValue, normalizeTextKey, normalizeJournalKey } from './strings.js';
+import { splitMultiValue, normalizeTextKey, normalizeJournalKey, isSamePerson } from './strings.js';
 
 function includesMultiValueFlex(value, expected) {
     const target = normalizeTextKey(expected);
     if (!target) return false;
     return splitMultiValue(value).some(item => normalizeTextKey(item) === target);
+}
+
+export function matchesAuthor(pub, docente, docenteId = '') {
+    const cleanDocenteId = String(docenteId || '').trim();
+    if (cleanDocenteId) {
+        const ids = splitMultiValue(pub?.identificacion);
+        if (ids.some(id => String(id).trim() === cleanDocenteId)) {
+            return true;
+        }
+    }
+    if (!docente) return false;
+    const authors = splitMultiValue(pub?.autor);
+    return authors.some(author => isSamePerson(author, docente));
 }
 
 export { includesMultiValueFlex };
@@ -16,7 +29,7 @@ function toArrayFilter(value) {
     return [value];
 }
 
-export function filtrarPublicaciones(publicaciones, { tipo, cuartil, docente, carrera, revista, query } = {}) {
+export function filtrarPublicaciones(publicaciones, { tipo, cuartil, docente, docenteId, carrera, revista, query } = {}) {
     let resultado = [...publicaciones];
 
     const tipos = toArrayFilter(tipo);
@@ -29,9 +42,8 @@ export function filtrarPublicaciones(publicaciones, { tipo, cuartil, docente, ca
         resultado = resultado.filter(p => cuartiles.includes(getCuartil(p)));
     }
 
-    if (docente) {
-        // Match tolerante para variaciones de espacios/mayúsculas/acentos sutiles
-        resultado = resultado.filter(p => includesMultiValueFlex(p.autor, docente));
+    if (docente || docenteId) {
+        resultado = resultado.filter(p => matchesAuthor(p, docente, docenteId));
     }
     if (carrera) {
         resultado = resultado.filter(p => includesMultiValueFlex(p.carrera, carrera));

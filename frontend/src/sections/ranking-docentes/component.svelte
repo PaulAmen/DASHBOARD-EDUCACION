@@ -2,6 +2,7 @@
     import { dataStore } from '../../data/store.svelte.js';
     import { filters, selectDocente } from '../../stores/filters.svelte.js';
     import { filtrarPublicaciones } from '../../lib/publicaciones/filtrar.js';
+    import { isSamePerson } from '../../lib/publicaciones/strings.js';
     import { calcularRanking } from '../../lib/ranking.js';
 
     let publicacionesRanking = $derived(filtrarPublicaciones(dataStore.publicacionesRaw, {
@@ -17,17 +18,25 @@
     let filtroTitular = $state('todos'); // 'todos', 'titulares', 'no_titulares'
     let filtroPhD = $state('todos');     // 'todos', 'phd', 'no_phd'
 
+    function isDocenteSelected(docente) {
+        if (!filters.docente && !filters.docenteId) return false;
+        if (filters.docenteId && docente.identificacion && String(filters.docenteId).trim() === String(docente.identificacion).trim()) {
+            return true;
+        }
+        return isSamePerson(docente.nombre, filters.docente);
+    }
+
     let docentesMostrados = $derived(topDocentes.filter(d => {
         if (filtroTitular === 'titulares' && !d.isTitular) return false;
         if (filtroTitular === 'no_titulares' && d.isTitular) return false;
         if (filtroPhD === 'phd' && !d.isPhD) return false;
         if (filtroPhD === 'no_phd' && d.isPhD) return false;
-        if (filters.docente && d.nombre !== filters.docente) return false;
+        if ((filters.docente || filters.docenteId) && !isDocenteSelected(d)) return false;
         return true;
     }));
 
-    function filterByDocente(nombre) {
-        selectDocente(nombre);
+    function filterByDocente(docente) {
+        selectDocente(docente.nombre, docente.identificacion);
     }
 
     function totalCuartilesSeleccionados(docente) {
@@ -77,11 +86,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {#each docentesMostrados as docente (docente.clave)}
             {@const medalla = medallaGlobal(docente.nombre)}
-            <div onclick={() => filterByDocente(docente.nombre)}
+            {@const isSelected = isDocenteSelected(docente)}
+            <div onclick={() => filterByDocente(docente)}
                  class="dashboard-card p-4 cursor-pointer border-2 transition-colors duration-200 focus-ring
-                 {filters.docente === docente.nombre ? 'border-[#289543] bg-green-50 shadow-md' : 'border-transparent hover:border-gray-200 hover:bg-gray-50'}"
-                 role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && filterByDocente(docente.nombre)}
-                 aria-label={`Filtrar por ${docente.nombre}`} aria-pressed={filters.docente === docente.nombre}>
+                 {isSelected ? 'border-[#289543] bg-green-50 shadow-md' : 'border-transparent hover:border-gray-200 hover:bg-gray-50'}"
+                 role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && filterByDocente(docente)}
+                 aria-label={`Filtrar por ${docente.nombre}`} aria-pressed={isSelected}>
 
                 <div class="flex items-start gap-3">
                     <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold
